@@ -17,6 +17,18 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_login_screen_shows_redesigned_brand_markers(): void
+    {
+        $response = $this->get('/login');
+
+        $response->assertStatus(200);
+        // Redesigned split-screen brand panel markers.
+        $response->assertSee('Daihatsu Sahabat', false);
+        $response->assertSee('Selamat datang kembali', false);
+        // The form still posts to the login route (auth contract preserved).
+        $response->assertSee('action="' . route('login') . '"', false);
+    }
+
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
         $user = User::factory()->create();

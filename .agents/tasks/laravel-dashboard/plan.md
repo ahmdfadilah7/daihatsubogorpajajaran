@@ -1,97 +1,226 @@
-# Implementation Plan — Daihatsu Sahabat Laravel 11 + MySQL Dashboard
+# Implementation Plan — Redesign Login + Admin Dashboard (Laravel 11, Daihatsu Sahabat)
 
-Builds ONE unified Laravel 11 app from the existing static site at `d:\DATA - AHMAD\Project\kuya`, following `.agents/tasks/laravel-dashboard/design.md`. The design is authoritative — this plan sequences it; it does not re-decide architecture.
+Scope is strictly the LOGIN/auth pages and the ADMIN dashboard + admin layout. The public site
+(`/`, `resources/views/home.blade.php`, `public/js/*`) is OUT OF SCOPE and keeps its own Tailwind
+CDN setup. Authentication behavior, routes, and the disabled-registration state must stay unchanged.
+Admin-facing copy stays in Bahasa Indonesia.
 
-Environment (verified): PHP 8.2.12 (XAMPP, on PATH), Composer 2.9.7, Node v24.15.0. MySQL via XAMPP at `"D:\DATA - AHMAD\xampp\mysql\bin\mysql.exe"` (NOT on PATH); DB `daihatsu_db` exists, user `root`, EMPTY password, 127.0.0.1:3306 (confirmed reachable). Shell is PowerShell: `;` sequences but does NOT stop on error — check each command's result, or guard with `; if ($LASTEXITCODE -ne 0) { break }`.
-
-Project root is NOT a git repo and NOT a worktree — work directly in `d:\DATA - AHMAD\Project\kuya`. Leave `.agents/` in place (not part of the shipped app). The 3 img assets (`img/halo.jpeg`, `img/bingung.jpeg`, `img/hubungi.jpeg`) and all 13 js modules + `css/style.css` + `js/tailwind.config.js` already exist and must be preserved.
-
-Verified JS contracts the DB→Blade bootstrap must satisfy (grep-confirmed in `js/`):
-- `catalog.js`: `car.accent[0]` is the badge pill background AND `--c1` card-top gradient start; `car.accent[1]` is `--c2`. Both must be non-null hex.
-- `catalog.js`/`compare.js`/`car-detail.js`: `CAT_STYLE[car.category]` — must be a keyed JS **object**, not an array.
-- `quiz.js`: `for (const model in opt.score)` — `score` must be a model→points **object map**.
-- `spin-wheel.js`: `String(PRIZES[i].short).split('\n')` — `short` must keep real newlines.
-- `corner-widget.js`/others: `onerror` → `App.FALLBACK_IMG`; `FALLBACK_IMG` is defined in `utils.js` (must stay in sequence).
-- `car-detail.js`: uses `car.desc || CAT_DESC[car.category] || <generic>` — do NOT emit a `desc` key for cars.
-- `main.js`: `App.renderCars(App.CARS)` runs synchronously → the inline `@json` bootstrap is required (no async API).
-
----
-
-## Phase 1 — Scaffold Laravel 11 + Breeze and merge into the project root
-
-- [ ] 1. Scaffold Laravel 11 into a temp sibling folder, then merge its contents into the project root so the result is ONE app rooted at `d:\DATA - AHMAD\Project\kuya` (per design B.3). Create temp app with `composer create-project laravel/laravel "d:\DATA - AHMAD\Project\kuya-laravel-temp"`; copy all temp contents into the project root (merging, do NOT overwrite existing `index.html`, `css/`, `js/`, `img/`, `.agents/`); then delete the temp folder.
-      Files: entire Laravel skeleton under `d:\DATA - AHMAD\Project\kuya` (app/, bootstrap/, config/, database/, public/, resources/, routes/, artisan, composer.json, etc.)
-      Verify: `php artisan --version` prints Laravel 11.x; `php artisan route:list` runs without fatal error.
-
-- [ ] 2. Copy the existing static assets into Laravel's `public/`: `css/` → `public/css/`, `js/` → `public/js/` (all 13 modules + `tailwind.config.js` + `data.js` kept as reference), `img/*.jpeg` → `public/img/`. Keep a reference copy of the original `index.html` at `public/legacy/index.html`. Leave the root-level `index.html`, `css/`, `js/`, `img/` as untouched backups (user said preserve).
-      Files: public/css/style.css, public/js/*.js, public/img/*.jpeg, public/legacy/index.html
-      Verify: `php artisan serve` then `curl http://127.0.0.1:8000/css/style.css` returns 200; `curl http://127.0.0.1:8000/js/tailwind.config.js` returns 200; `curl http://127.0.0.1:8000/img/halo.jpeg` returns 200.
-
-- [ ] 3. Install Laravel Breeze (Blade stack) for auth scaffolding: `composer require laravel/breeze --dev` then `php artisan breeze:install blade`. Node build is optional (admin + public use Tailwind CDN); if run, `npm install ; npm run build`.
-      Files: routes/auth.php, app/Http/Controllers/Auth/*, resources/views/auth/*, resources/views/layouts/*, app/View/Components/*
-      Verify: `php artisan route:list --name=login` shows the login route; app still boots via `php artisan serve`.
-
-## Phase 2 — Database connection config
-
-- [ ] 4. Set the `.env` database block to MySQL `daihatsu_db`, root, empty password, 127.0.0.1:3306 (design B.15). Ensure `.env` exists (`Copy-Item .env.example .env` if absent) and run `php artisan key:generate`. The app never creates the DB; it only creates tables.
-      Files: .env
-      Verify: `php artisan db:show` (or `php artisan tinker --execute="DB::connection()->getPdo();"`) connects to `daihatsu_db` with no error (requires XAMPP MySQL running).
-
-## Phase 3 — Migrations for all 7 entity groups (+ Breeze users)
-
-- [ ] 5. Create migrations for all content tables exactly per design B.4: `cars` (incl. `accent1`/`accent2` char(7), `img` varchar(500) NOT NULL, `badge` nullable, `sort_order`), `category_styles` (`category` unique), `quiz_questions`, `quiz_options` (FK → quiz_questions cascade), `quiz_option_scores` (FK → quiz_options cascade, `car_model` string), `wheel_prizes`, `corner_images` (`src` NOT NULL), `hero_slides` (`img` NOT NULL), `testimonials` (`img` NOT NULL, `rating` tinyint). Keep Breeze's default `users`/`sessions`/etc. All get `id` + timestamps unless noted. `cars.img`, `hero_slides.img`, `testimonials.img`, `corner_images.src` MUST be NOT NULL (design #2 fix).
-      Files: database/migrations/*_create_cars_table.php, *_create_category_styles_table.php, *_create_quiz_questions_table.php, *_create_quiz_options_table.php, *_create_quiz_option_scores_table.php, *_create_wheel_prizes_table.php, *_create_corner_images_table.php, *_create_hero_slides_table.php, *_create_testimonials_table.php
-      Verify: `php artisan migrate:fresh` completes with no errors; `& "D:\DATA - AHMAD\xampp\mysql\bin\mysql.exe" -u root -h 127.0.0.1 daihatsu_db -e "SHOW TABLES;"` lists all 7 content tables + users.
-
-## Phase 4 — Eloquent models + relationships
-
-- [ ] 6. Create models with fillables, casts, and relationships per design B.5: `Car` (casts price/year/seats to int; `accent` accessor returns `[accent1, accent2]`), `CategoryStyle`, `QuizQuestion` (hasMany QuizOption ordered by sort_order), `QuizOption` (belongsTo QuizQuestion, hasMany QuizOptionScore), `QuizOptionScore` (belongsTo QuizOption), `WheelPrize`, `CornerImage`, `HeroSlide`, `Testimonial`.
-      Files: app/Models/Car.php, CategoryStyle.php, QuizQuestion.php, QuizOption.php, QuizOptionScore.php, WheelPrize.php, CornerImage.php, HeroSlide.php, Testimonial.php
-      Verify: `php artisan tinker --execute="App\Models\Car::query()->toSql();"` runs; a Pest/PHPUnit model test asserting `Car::make([...])->accent === ['#aaa','#bbb']`-shape passes via `php artisan test --filter=Model`.
-
-## Phase 5 — Seeders reproducing exact js/data.js values
-
-- [ ] 7. Create seeders reproducing EXACT `js/data.js` values (design B.14), wired through `DatabaseSeeder` in order: `AdminUserSeeder` (admin@daihatsu.test / password hashed), `CategoryStyleSeeder` (4 rows), `CarSeeder` (9 rows id 1..9, accent split into accent1/accent2 verbatim incl. Sigra `#ffc529`/`#f59e0b`, empty badge → NULL, `sort_order` = 0-based index), `QuizSeeder` (4 questions + 14 options + all score pairs verbatim, `sort_order` set), `WheelPrizeSeeder` (6 rows, real `\n` in `short`), `CornerImageSeeder` (3 rows `img/*.jpeg`), `HeroSlideSeeder` (4 rows, desc→description), `TestimonialSeeder` (6 rows). Every seeder sets `sort_order` to the 0-based array index.
-      Files: database/seeders/DatabaseSeeder.php, AdminUserSeeder.php, CategoryStyleSeeder.php, CarSeeder.php, QuizSeeder.php, WheelPrizeSeeder.php, CornerImageSeeder.php, HeroSlideSeeder.php, TestimonialSeeder.php
-      Verify: `php artisan migrate:fresh --seed` completes clean; row counts via mysql CLI are cars=9, category_styles=4, quiz_questions=4, quiz_options=14, quiz_option_scores (sum of all score maps), wheel_prizes=6, corner_images=3, hero_slides=4, testimonials=6, users=1 (design AC #9).
-
-## Phase 6 — Public page: controller, layout, @json bootstrap, ported markup
-
-- [ ] 8. Create `PublicSiteController@home` that loads all 7 groups ordered by `sort_order` then `id`, and shapes them into the exact arrays the JS expects (design B.6): CARS array (accent as 2-element array, badge NULL→'', NO desc key), CAT_STYLE as a PHP **associative array keyed by category** (`->keyBy('category')->map(...)->toArray()`, never `->values()`), QUIZ nested with `score` as model→points object map, WHEEL_PRIZES (real `\n` preserved), CORNER_IMAGES, HERO_SLIDES (description→desc), TESTIMONIALS (rating int). Register `GET /` → name `home` in `routes/web.php`.
-      Files: app/Http/Controllers/PublicSiteController.php, routes/web.php
-      Verify: `php artisan test --filter=Public` — a feature test on `GET /` returns 200, body contains `App.CARS = [` with 9 entries, contains `App.CAT_STYLE = {` and NOT `App.CAT_STYLE = [` (design B.16 regression guard).
-
-- [ ] 9. Convert `index.html` into `resources/views/home.blade.php` + `resources/views/partials/app-data.blade.php` (design B.6). In `home.blade.php`: rewrite asset refs to `{{ asset(...) }}`; keep head order EXACTLY — `https://cdn.tailwindcss.com` then `{{ asset('js/tailwind.config.js') }}` then `css/style.css` (tailwind.config.js is a HEAD script, NOT a body module); keep the 13-script body order 1:1, replacing ONLY the first `<script src="js/data.js">` with `@include('partials.app-data')` and wrapping the other 12 in `{{ asset('js/xxx.js') }}`. `app-data.blade.php` emits the `window.App.* = @json($...)` block from the controller's shaped arrays.
-      Files: resources/views/home.blade.php, resources/views/partials/app-data.blade.php
-      Verify: `php artisan serve`; load `http://127.0.0.1:8000/` in a browser — hero slider, car grid+filters, quiz, testimonials, spin wheel, corner widget all render identically to the static site; browser console shows `App.CARS.length === 9`, `typeof App.CAT_STYLE === 'object'` and not Array, `App.QUIZ.length === 4`. Design AC #1, #2, #3, #4.
-
-## Phase 7 — Admin auth + full CRUD for every entity
-
-- [ ] 10. Disable self-service registration (design B.7/B.13): delete the `register` GET and POST routes in `routes/auth.php`, and remove the Register link block from `resources/views/auth/login.blade.php`. Seed admin already created in Phase 5.
-      Files: routes/auth.php, resources/views/auth/login.blade.php
-      Verify: `php artisan route:list` shows NO `register` route; `php artisan test --filter=Auth` — a test asserting `POST /register` returns 404 passes; `GET /admin` as guest redirects to `/login`.
-
-- [ ] 11. Create the admin layout and dashboard: `resources/views/layouts/admin.blade.php` (Tailwind-CDN layout, Indonesian sidebar: Mobil, Gaya Kategori, Kuis, Hadiah Roda, Gambar Pojok, Slide Hero, Testimoni + logout; Indonesian flash `sukses`/`gagal`), `DashboardController@index`, and the admin route group (`prefix('admin')`, `middleware('auth')`, `name('admin.')`) with all 7 `Route::resource(...)->except('show')` entries (design B.7).
-      Files: resources/views/layouts/admin.blade.php, app/Http/Controllers/Admin/DashboardController.php, routes/web.php
-      Verify: `php artisan route:list --path=admin` lists dashboard + 7 resources (index/create/store/edit/update/destroy each); authenticated `GET /admin` returns 200.
-
-- [ ] 12. Create FormRequest validators for all 7 entities per design B.9 (split Store/Update where required-ness differs): shared hex rule `/^#[0-9A-Fa-f]{6}$/` for color/bg/accent; shared image rule (string accepts `http(s)://` | `img/` | `storage/`; optional `image` upload mimes jpg/jpeg/png/webp max 4096; `required_without` pairing on CREATE only, optional on UPDATE). Car (model/type/category in LCGC,MPV,SUV,Niaga/year 1990-2100/price>=0/transmission in CVT,Manual,Otomatis/seats 1-20/accent hex), CategoryStyle (`category` unique ignoring self, read-only on update), QuizQuestion (nested options + scores arrays), WheelPrize, CornerImage, HeroSlide, Testimonial (rating 1-5). Indonesian messages.
-      Files: app/Http/Requests/StoreCarRequest.php, UpdateCarRequest.php, CategoryStyleRequest.php, QuizQuestionRequest.php, WheelPrizeRequest.php, Store/Update CornerImageRequest.php, Store/Update HeroSlideRequest.php, Store/Update TestimonialRequest.php
-      Verify: `php artisan test --filter=Request` — tests for invalid hex accent, rating outside 1-5, negative price, missing model each fail validation; valid payloads pass. Design AC #11.
-
-- [ ] 13. Create the 7 admin resource controllers + their Blade views (index/create/edit + shared form partial), with Indonesian labels, `<input type="color">` + text for hex, URL text + `<input type="file">` for images. Image resolution precedence on store/update: `(uploaded file path) ?? (submitted non-empty string) ?? (existing stored value)`; uploads stored on the `public` disk as `storage/uploads/...`. CategoryStyle: block delete when a car references it; `category` read-only on edit. QuizQuestion: create/edit embeds repeatable options each with repeatable (model `<select>`, points) rows, synced in a `DB::transaction`. `php artisan storage:link` must be run.
-      Files: app/Http/Controllers/Admin/{Car,CategoryStyle,QuizQuestion,WheelPrize,CornerImage,HeroSlide,Testimonial}Controller.php; resources/views/admin/{cars,category-styles,quiz,wheel-prizes,corner-images,hero-slides,testimonials}/{index,create,edit}.blade.php + form partials
-      Verify: `php artisan storage:link` succeeds; `php artisan test --filter=Admin` — authenticated CRUD round-trip tests pass: create a car → it appears in `GET /` body; upload a corner image → file stored under `public/storage` and shows on `/`; delete a referenced category is blocked with Indonesian flash; quiz store writes options+scores atomically and bad child input rolls back. Design AC #7, #8, #10.
-
-## Phase 8 — Full verification
-
-- [ ] 14. Run the complete bootstrap + test suite end to end (design B.15): `composer install` ; `php artisan key:generate` ; `php artisan storage:link` ; `php artisan migrate:fresh --seed` ; `php artisan test`. Fix any failures before marking complete. Then manually load `/` and `/admin` to confirm visual parity and that CRUD edits change the public page after reload.
-      Files: (none — verification only)
-      Verify: `php artisan migrate:fresh --seed` completes with no errors and correct row counts (AC #9); `php artisan test` is green; `GET /` renders identically to the original static site with data from MySQL (AC #1); `/admin` requires login and all 7 CRUD sections work (AC #7, #8).
+## Environment / commands (Windows PowerShell)
+- Chain with `;` (NOT `&&`); `;` does NOT stop on failure, so check each command individually.
+- Tooling on PATH: `php` 8.2.12 (XAMPP), `composer` 2.9.7, `node` 24.15.0, `npm`. XAMPP MySQL running.
+- Build commands: `npm install`, then `npm run build` (vite build). Dev: `npm run dev`.
+- App serve for manual check: `php artisan serve` (http://127.0.0.1:8000). Clear caches with
+  `php artisan view:clear ; php artisan config:clear` if Blade changes don't show.
+- Admin login to test: `admin@daihatsu.test` / `password`. `/` open; `/admin` requires login;
+  `/register` must stay 404.
 
 ---
 
-## Assumptions / gaps
-- No README existed; `.env.example` from Laravel's scaffold is the config baseline. A short README note documenting "start XAMPP MySQL before migrating" and the seeded admin credentials (admin@daihatsu.test / password) should be added during Phase 1 or 8 (design B.13/B.15).
-- Node build (`npm run build`) is treated as optional per design B.2 — both admin and public rely on the Tailwind CDN, so rendering does not depend on Vite output.
-- MySQL must be running (XAMPP) for Phases 2+ verification; confirmed reachable during planning.
+## KEY DECISION 1 — CDN vs Vite (settled: standardize admin + auth on Vite)
+
+Rationale: The admin layout (`resources/views/layouts/admin.blade.php`) currently loads Tailwind via
+`https://cdn.tailwindcss.com` and Font Awesome via cdnjs, while Breeze/auth already uses
+`@vite([...])`. To bundle Chart.js and an icon set properly (purged, offline-capable, version-pinned)
+the admin area must use the Vite pipeline. This is low-risk here because:
+- `tailwind.config.js` content globs already include `./resources/views/**/*.blade.php`, so every
+  admin + auth Blade (dashboard, the 7 CRUD sections' index/create/edit, all auth views) is scanned
+  and their utility classes are compiled.
+- The public site uses a SEPARATE CDN setup inside `home.blade.php` only; it is never touched, so
+  switching the admin layout cannot regress it.
+
+Risk to manage: after dropping `cdn.tailwindcss.com`, only classes visible in content globs are
+compiled. The CRUD views use standard palette classes (slate/blue/green/red) + inline `style=""`
+colors + `fa-solid`/`fa-regular` Font Awesome icons. Verification MUST confirm admin + CRUD pages
+render fully styled with the CDN removed (step 10). Font Awesome moves from CDN to the bundled
+`@fortawesome/fontawesome-free` package so the existing `<i class="fa-solid fa-*">` markup keeps
+working everywhere.
+
+## KEY DECISION 2 — npm packages to install
+- `chart.js@4.5.1` — charting library for the dashboard widgets (doughnut: content distribution;
+  bar: cars per category). Pairs cleanly with Alpine via a small init script. Pinned exact.
+- `@fortawesome/fontawesome-free@7.3.1` — bundled icon set replacing the cdnjs Font Awesome CDN so
+  all existing `fa-solid`/`fa-regular` icon markup (admin layout, dashboard, CRUD views, redesigned
+  login) renders from the Vite build. Pinned exact. (Font Awesome 7 keeps the `fa-solid`/`fa-regular`
+  style class names used in the codebase.)
+
+Wiring: both installed as devDependencies via `npm install -D`. Chart.js imported in
+`resources/js/app.js` and exposed for the dashboard init; Font Awesome CSS imported in
+`resources/css/app.css` via `@import '@fortawesome/fontawesome-free/css/all.min.css';`. Everything
+ships through the existing `@vite(['resources/css/app.css','resources/js/app.js'])`.
+
+## KEY DECISION 3 — Login layout
+Split-screen in the guest layout: left brand panel (Daihatsu Sahabat identity, gradient, tagline,
+hidden on mobile) + right card holding the existing login form, restyled. Keep ALL auth contracts:
+`route('login')` action, `@csrf`, field names `email`/`password`/`remember`, `autofocus`,
+`autocomplete`, `x-input-error`, `x-auth-session-status`. The guest layout change must stay
+backward-compatible for the other auth pages (forgot/reset/confirm/verify) OR those pages get the
+same treatment — chosen approach below keeps the guest layout as a two-column shell that degrades to
+a single centered card so the other auth views keep working with only light restyle.
+
+## KEY DECISION 4 — Dashboard widgets + controller data (additive)
+`DashboardController@index` keeps the existing `$counts` keys (cars, categoryStyles, quizQuestions,
+wheelPrizes, cornerImages, heroSlides, testimonials) and ADDS:
+- `carsByCategory` — `Car::selectRaw('category, COUNT(*) c')->groupBy('category')->pluck('c','category')`
+  for the bar chart.
+- `latestCars` — `Car::latest('id')->take(5)->get(['id','model','type','category','price','img'])`.
+- `latestTestimonials` — `Testimonial::latest('id')->take(5)->get(['id','name','city','car','rating'])`.
+Widgets: polished stat-card row (7 counts, Indonesian labels, icons, gradient/shadow, hover),
+a doughnut chart of overall content distribution (the 7 counts), a bar chart of cars per category,
+and a recent-items list (latest cars + latest testimonials). Chart data passed to JS via
+`@json(...)` in a `@push('scripts')` block.
+
+---
+
+# Implementation Plan
+
+- [ ] 1. Install the two frontend packages and pin exact versions.
+      Run `npm install -D chart.js@4.5.1 @fortawesome/fontawesome-free@7.3.1` in the project root.
+      Files: `package.json`, `package-lock.json`
+      Verify: `npm ls chart.js @fortawesome/fontawesome-free` lists both at the pinned versions with
+      exit code 0.
+
+- [ ] 2. Wire the plugins through the Vite entry files.
+      In `resources/js/app.js` import Chart.js and expose it (`import Chart from 'chart.js/auto';
+      window.Chart = Chart;`) above `Alpine.start()`. In `resources/css/app.css` add
+      `@import '@fortawesome/fontawesome-free/css/all.min.css';` ABOVE the `@tailwind` directives.
+      Files: `resources/js/app.js`, `resources/css/app.css`
+      Verify: `npm run build` completes with exit code 0 and writes assets under `public/build`
+      (`public/build/manifest.json` updated; a hashed `app-*.js` and `app-*.css` emitted).
+
+- [ ] 3. Add brand theme colors used by the redesign to the Tailwind config so compiled classes exist.
+      In `tailwind.config.js` extend `theme.extend.colors` with a `brand` scale (e.g. a Daihatsu
+      red/orange primary + supporting shades) that the login panel and dashboard gradients reference.
+      Only add colors actually used by later steps; keep existing `fontFamily` block.
+      Files: `tailwind.config.js`
+      Verify: `npm run build` exits 0 (config parses) — run after step 2 wiring is in place.
+
+- [ ] 4. Redesign the guest layout into a responsive split-screen auth shell on the Vite pipeline.
+      Rework `resources/views/layouts/guest.blade.php`: full-height two-column grid — left brand panel
+      (Daihatsu Sahabat name/logo, gradient using the brand colors, tagline, hidden `lg` and below on
+      narrow screens) and right column centering `{{ $slot }}` in a styled card. Keep
+      `@vite(['resources/css/app.css','resources/js/app.js'])`, `csrf-token` meta, and the fonts link.
+      The shell must still look correct when the slot is a plain form (so forgot/reset/confirm/verify
+      keep working). Keep `<x-application-logo>` usage valid.
+      Files: `resources/views/layouts/guest.blade.php`
+      Verify: `npm run build` exits 0; then `php artisan serve` and load `/login` in a browser — the
+      split-screen renders, brand panel left, card right; shrink the window and confirm it stacks to a
+      single centered card on mobile widths.
+
+- [ ] 5. Restyle the login view, preserving every auth contract.
+      Rework `resources/views/auth/login.blade.php` inside `<x-guest-layout>`: heading/subtitle,
+      email + password fields with leading Font Awesome icons, styled remember-me, forgot-password
+      link, full-width primary button, and the session-status + validation error blocks. MUST keep
+      the `<form method="POST" action="{{ route('login') }}">`, `@csrf`, input `name="email"`,
+      `name="password"`, `name="remember"`, `autofocus`, `autocomplete="username"` /
+      `autocomplete="current-password"`, and `<x-input-error>` / `<x-auth-session-status>` usage.
+      Reuse/restyle `x-text-input`, `x-input-label`, `x-primary-button` (restyle the component files
+      only if the change is backward-compatible for the other auth pages; prefer passing classes).
+      Files: `resources/views/auth/login.blade.php` (and, only if restyled, the shared components
+      under `resources/views/components/`)
+      Verify: `php artisan serve`; at `/login` submit WRONG credentials → validation error renders in
+      the new styling and you stay on `/login`; submit `admin@daihatsu.test` / `password` → redirect
+      to `/admin` dashboard (auth still works). Confirm `/register` still returns 404.
+
+- [ ] 6. Confirm the other auth pages still render under the new guest shell; apply light restyle only.
+      Load forgot-password, reset-password, confirm-password, verify-email and confirm the two-column
+      shell degrades gracefully. If any looks broken, adjust those views minimally to match (headings,
+      spacing) without changing their form actions/fields.
+      Files: `resources/views/auth/forgot-password.blade.php`, `reset-password.blade.php`,
+      `confirm-password.blade.php`, `verify-email.blade.php` (only as needed)
+      Verify: `php artisan serve`; load `/forgot-password` — page renders fully styled with the new
+      shell, the email field and submit button are usable, no layout overflow.
+
+- [ ] 7. Move the admin layout off the Tailwind/Font Awesome CDN onto the Vite build and modernize it.
+      In `resources/views/layouts/admin.blade.php`: REMOVE `<script src="https://cdn.tailwindcss.com">`
+      and the cdnjs Font Awesome `<link>`; ADD `@vite(['resources/css/app.css','resources/js/app.js'])`
+      in `<head>`. Modernize the sidebar (brand header, grouped nav with the existing 8 routes and
+      `request()->routeIs()` active-state styling, keep the `fa-*` icons) and the topbar (page heading
+      + logged-in admin name/email via `Auth::user()` and a logout control). Keep the existing
+      `session('sukses')`, `session('gagal')`, `$errors` alert blocks (restyled) and `@yield('content')`,
+      `@yield('heading')`, `@stack('scripts')`. Keep the logout form posting to `route('logout')`.
+      Files: `resources/views/layouts/admin.blade.php`
+      Verify: `npm run build` exits 0; `php artisan serve`; log in and load `/admin` — sidebar, topbar
+      (shows admin name/email), and icons all render with the CDN scripts gone (check page source: no
+      `cdn.tailwindcss.com`). Logout button logs out and returns to `/login`.
+
+- [ ] 8. Extend DashboardController additively with chart + recent-items data.
+      In `app/Http/Controllers/Admin/DashboardController.php` keep `$counts` unchanged and add
+      `$carsByCategory`, `$latestCars`, `$latestTestimonials` (queries per KEY DECISION 4; import
+      `App\Models\Car`/`Testimonial` already present — add any missing use statements). Pass all via
+      `compact(...)` to the view. Do not remove or rename existing keys.
+      Files: `app/Http/Controllers/Admin/DashboardController.php`
+      Verify: `php artisan serve`; load `/admin` with no PHP error (HTTP 200) — the page still renders
+      the counts (data wiring confirmed in step 9). Optionally `php artisan tinker` to eval
+      `app(App\Http\Controllers\Admin\DashboardController::class)->index()` returns a view.
+
+- [ ] 9. Redesign the dashboard view with stat cards, two charts, and a recent-items list.
+      Rework `resources/views/admin/dashboard.blade.php`: polished stat-card row for the 7 counts
+      (Indonesian labels Mobil, Gaya Kategori, Pertanyaan Kuis, Hadiah Roda, Gambar Pojok, Slide Hero,
+      Testimoni; icons, gradient/shadow, hover, each linking to its CRUD index as today); a doughnut
+      chart (content distribution from `$counts`) and a bar chart (`$carsByCategory`) using two
+      `<canvas>` elements initialized in a `@push('scripts')` block that reads data via `@json(...)`
+      and `window.Chart`; and a recent-items section listing `$latestCars` and `$latestTestimonials`.
+      Files: `resources/views/admin/dashboard.blade.php`
+      Verify: `php artisan serve`; load `/admin` in a browser — stat cards, BOTH charts render (no
+      console errors), and the recent-items list shows seeded cars/testimonials. Click a stat card →
+      navigates to the matching CRUD index.
+
+- [ ] 10. Regression check: all 7 CRUD sections render fully styled with the CDN removed.
+      With only the Vite build active, open an index AND a create/edit page across the sections (at
+      minimum cars, category-styles, testimonials) and confirm tables, buttons, form inputs, badges,
+      and `fa-*` icons are styled (compiled Tailwind + bundled Font Awesome cover them). If any class
+      is missing, add it to a safelist or confirm the content glob covers the file, then rebuild.
+      Files: none expected (fix only if a regression is found)
+      Verify: `php artisan serve`; load `/admin/cars`, `/admin/cars/create`,
+      `/admin/category-styles`, `/admin/testimonials` — each renders fully styled, no raw/unstyled
+      HTML, no missing icons, flash alert styling intact after a create/update.
+
+- [ ] 11. Final production build and clean verification.
+      Run `php artisan view:clear ; php artisan config:clear` then `npm run build`. Confirm the built
+      manifest references the updated `app.css`/`app.js` and that `/login`, `/admin`, and one CRUD
+      page all load correctly against the production build (stop any `npm run dev` first so Vite serves
+      the built assets, not the dev server).
+      Files: none (build artifacts under `public/build`)
+      Verify: `npm run build` exits 0; `php artisan serve`; load `/login` (split-screen),
+      log in, `/admin` (stat cards + 2 charts + recent items), and `/admin/cars` (styled table) — all
+      render from `public/build` with no CDN scripts and no console errors.
+
+---
+
+## Notes / assumptions
+- `User` is the standard Breeze model with `name` + `email`; the topbar reads `Auth::user()->name`
+  and `->email`.
+- Font Awesome 7 retains the `fa-solid` / `fa-regular` style classes already used across admin views,
+  so swapping the CDN for the bundled package needs no icon-markup changes. If a specific legacy icon
+  name differs in v7, pin `@fortawesome/fontawesome-free@6.5.1` instead (matches the old CDN) — decide
+  during step 10 if any icon is missing.
+- Packages are installed as devDependencies to match the existing `package.json` layout (Vite builds
+  at deploy time); switch to `dependencies` only if the deploy pipeline prunes devDependencies before
+  building.
+- Charts are initialized with vanilla `new window.Chart(canvas, {...})` in a pushed script; no extra
+  Alpine plugin is required since Alpine is already bundled.
+- The loop's stop contract is unchanged: the reviewer writes
+  `d:\DATA - AHMAD\Project\kuya\.agents\tasks\laravel-dashboard\review.json` with top-level
+  `"verdict": "APPROVED"` as its last action.
+
+---
+
+## IMPLEMENTATION RESULT — packages installed (name + exact version + why)
+
+Installed as devDependencies via `npm install -D` and wired through the existing
+`@vite(['resources/css/app.css','resources/js/app.js'])` pipeline:
+
+- **chart.js@4.5.1** — charting library for the dashboard widgets. Imported in
+  `resources/js/app.js` as `import Chart from 'chart.js/auto'` and exposed as `window.Chart` so the
+  Blade `@push('scripts')` init block renders a doughnut (content distribution across the 7 counts)
+  and a bar chart (cars per category).
+- **@fortawesome/fontawesome-free@7.3.1** — bundled icon set replacing the cdnjs Font Awesome CDN
+  that the admin layout used, so every existing `fa-solid`/`fa-regular` icon (admin layout, dashboard,
+  CRUD views, redesigned login/auth pages) renders from the Vite build. Imported in
+  `resources/css/app.css` via `@import '@fortawesome/fontawesome-free/css/all.min.css';`. FA 7 keeps
+  the `fa-solid`/`fa-regular` style class names, so no icon markup changed.
+
+Both verified present via `npm ls chart.js @fortawesome/fontawesome-free` and in the production
+build output (hashed `app-*.js` includes Chart.js; `fa-*.woff2` webfonts emitted under
+`public/build/assets`). The public site (`home.blade.php`) keeps its own Tailwind CDN and was not
+touched.

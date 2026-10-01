@@ -25,6 +25,21 @@ class DashboardController extends Controller
             'testimonials' => Testimonial::count(),
         ];
 
-        return view('admin.dashboard', compact('counts'));
+        // Chart data: number of cars per category (bar chart).
+        $carsByCategory = Car::selectRaw('category, COUNT(*) as c')
+            ->groupBy('category')
+            ->orderBy('category')
+            ->pluck('c', 'category');
+
+        // Recent-items lists for the dashboard activity panels.
+        $latestCars = Car::latest('id')->take(5)->get(['id', 'model', 'type', 'category', 'price', 'img']);
+        $latestTestimonials = Testimonial::latest('id')->take(5)->get(['id', 'name', 'city', 'car', 'rating']);
+
+        return view('admin.dashboard', compact(
+            'counts',
+            'carsByCategory',
+            'latestCars',
+            'latestTestimonials',
+        ));
     }
 }
