@@ -1,7 +1,13 @@
 {
   "task_id": "task-laravel-dashboard",
   "task_description": "Build ONE unified Laravel 11 + MySQL (daihatsu_db) app from the existing static Daihatsu Sahabat site: serve the public landing page unchanged (data sourced from MySQL via an inline Blade @json bootstrap replacing js/data.js) and add a Breeze-protected /admin dashboard with full CRUD for all 7 content groups. Follow .agents/tasks/laravel-dashboard/design.md.",
-  "status": "pending",
+  "status": "completed",
   "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"],
+  "feature_statuses": {
+    "FEAT-001": "completed",
+    "FEAT-002": "completed",
+    "FEAT-003": "completed",
+    "FEAT-004": "completed"
+  },
   "blocked_reason": null
 }
