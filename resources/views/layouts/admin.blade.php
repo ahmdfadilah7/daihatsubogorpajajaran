@@ -26,6 +26,8 @@
                 ['admin.testimonials.index', 'Testimoni', 'fa-comment-dots', 'admin.testimonials.*'],
             ],
             'Sistem' => [
+                ['admin.users.index', 'Pengguna', 'fa-users', 'admin.users.*'],
+                ['admin.profile.edit', 'Profil', 'fa-id-card', 'admin.profile.*'],
                 ['admin.settings.edit', 'Pengaturan Website', 'fa-gear', 'admin.settings.*'],
             ],
         ];
@@ -43,7 +45,7 @@
     @endphp
 
     {{-- Sidebar --}}
-    <aside class="fixed inset-y-0 left-0 z-40 w-64 shrink-0 flex-col bg-gradient-to-b from-slate-900 to-slate-950 text-slate-100 shadow-xl transition-transform lg:static lg:flex lg:translate-x-0"
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 shrink-0 flex-col bg-gradient-to-b from-slate-900 to-slate-950 text-slate-100 shadow-xl transition-transform lg:sticky lg:top-0 lg:h-screen lg:flex lg:translate-x-0"
            :class="sidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full lg:flex'">
         <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
             <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-600/40">
@@ -144,6 +146,11 @@
                                 <p class="text-sm font-semibold text-slate-900">{{ Auth::user()->name }}</p>
                                 <p class="truncate text-xs text-slate-500">{{ Auth::user()->email }}</p>
                             </div>
+                            <a href="{{ route('admin.profile.edit') }}"
+                               class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-brand-600">
+                                <i class="fa-solid fa-id-card w-4 text-center"></i>
+                                <span>Profil</span>
+                            </a>
                             <a href="{{ route('home') }}" target="_blank"
                                class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-brand-600">
                                 <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center"></i>

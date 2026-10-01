@@ -5,9 +5,11 @@ use App\Http\Controllers\Admin\CategoryStyleController;
 use App\Http\Controllers\Admin\CornerImageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\QuizQuestionController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WheelPrizeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicSiteController;
@@ -35,6 +37,13 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('corner-images', CornerImageController::class)->except('show');
     Route::resource('hero-slides', HeroSlideController::class)->except('show');
     Route::resource('testimonials', TestimonialController::class)->except('show');
+
+    // User account management (Pengguna).
+    Route::resource('users', UserController::class)->except('show');
+
+    // Current user's profile (Profil).
+    Route::get('profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
+    Route::match(['put', 'patch'], 'profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
     // Singleton website settings page (Pengaturan Website).
     Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
