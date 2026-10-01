@@ -2,10 +2,53 @@
     $inputClass = 'w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500';
     $errClass = 'border-red-400 focus:border-red-500 focus:ring-red-500';
     $val = fn ($key) => old($key, $settings[$key] ?? '');
+
+    // Tab definitions for the settings form. Each key matches an x-show panel
+    // below; the label + icon render the tab button. Keeping every panel in the
+    // SAME <form> means Simpan still submits all fields regardless of the
+    // active tab (x-show only hides via CSS, it does not detach the inputs).
+    $tabs = [
+        ['id' => 'identitas', 'label' => 'Identitas', 'icon' => 'fa-id-badge'],
+        ['id' => 'seo', 'label' => 'SEO / Meta', 'icon' => 'fa-magnifying-glass'],
+        ['id' => 'social', 'label' => 'Social / OG', 'icon' => 'fa-share-nodes'],
+        ['id' => 'kontak', 'label' => 'Kontak', 'icon' => 'fa-address-book'],
+        ['id' => 'fitur', 'label' => 'Fitur', 'icon' => 'fa-toggle-on'],
+        ['id' => 'promo', 'label' => 'Promo & Navbar', 'icon' => 'fa-bullhorn'],
+        ['id' => 'hero', 'label' => 'Hero', 'icon' => 'fa-star'],
+        ['id' => 'bagian', 'label' => 'Bagian', 'icon' => 'fa-heading'],
+        ['id' => 'kalkulator', 'label' => 'Kalkulator', 'icon' => 'fa-calculator'],
+        ['id' => 'roda', 'label' => 'Roda', 'icon' => 'fa-trophy'],
+        ['id' => 'footer', 'label' => 'Footer', 'icon' => 'fa-shoe-prints'],
+    ];
 @endphp
 
-<div class="space-y-10">
+{{-- Tabbed layout: a single form, panels toggled by Alpine so the page no
+     longer scrolls through every section at once. The active tab persists in
+     the URL hash so a refresh / validation error keeps the user in place. --}}
+<div x-data="{
+        tab: (window.location.hash || '#identitas').replace('#', ''),
+        valid: @js(collect($tabs)->pluck('id')->all()),
+        init() { if (!this.valid.includes(this.tab)) this.tab = 'identitas'; },
+        go(id) { this.tab = id; history.replaceState(null, '', '#' + id); },
+     }">
+    {{-- Tab bar (horizontally scrollable on small screens, sticks under the topbar) --}}
+    <div class="sticky top-[57px] z-10 -mx-4 mb-6 border-b border-slate-200 bg-slate-100/95 px-4 backdrop-blur sm:-mx-6 sm:px-6">
+        <nav class="flex gap-1 overflow-x-auto py-2" aria-label="Bagian pengaturan">
+            @foreach ($tabs as $t)
+                <button type="button" @click="go('{{ $t['id'] }}')"
+                        :class="tab === '{{ $t['id'] }}'
+                            ? 'bg-brand-600 text-white shadow-sm'
+                            : 'text-slate-600 hover:bg-white hover:text-brand-600'"
+                        class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition">
+                    <i class="fa-solid {{ $t['icon'] }}" aria-hidden="true"></i>
+                    <span>{{ $t['label'] }}</span>
+                </button>
+            @endforeach
+        </nav>
+    </div>
+
     {{-- ============================ Identitas Situs ============================ --}}
+    <div x-show="tab === 'identitas'" x-cloak>
     <x-admin.form-section title="Identitas Situs" subtitle="Nama, tagline, logo, dan favicon situs." icon="fa-id-badge">
         <div class="md:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Nama Website</label>
@@ -25,8 +68,10 @@
             @include('admin.partials.image-input', ['name' => 'favicon', 'label' => 'Favicon', 'value' => $settings['favicon'] ?? '', 'fileName' => 'favicon_file'])
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ SEO / Meta ============================ --}}
+    <div x-show="tab === 'seo'" x-cloak>
     <x-admin.form-section title="SEO / Meta" subtitle="Judul, deskripsi, kata kunci, dan penulis untuk mesin pencari." icon="fa-magnifying-glass">
         <div class="md:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Meta (Title)</label>
@@ -51,8 +96,10 @@
             @error('meta_author')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Social / Open Graph ============================ --}}
+    <div x-show="tab === 'social'" x-cloak>
     <x-admin.form-section title="Social / Open Graph" subtitle="Pratinjau saat dibagikan di media sosial." icon="fa-share-nodes">
         <div class="md:col-span-2">
             @include('admin.partials.image-input', ['name' => 'og_image', 'label' => 'Gambar Open Graph (OG Image)', 'value' => $settings['og_image'] ?? '', 'fileName' => 'og_image_file'])
@@ -68,8 +115,10 @@
             @error('og_description')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Kontak & Lainnya ============================ --}}
+    <div x-show="tab === 'kontak'" x-cloak>
     <x-admin.form-section title="Kontak &amp; Lainnya" subtitle="Informasi kontak dan tautan media sosial (opsional)." icon="fa-address-book">
         <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">WhatsApp</label>
@@ -102,8 +151,10 @@
             @error('social_youtube')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Fitur Situs ============================ --}}
+    <div x-show="tab === 'fitur'" x-cloak>
     @php
         // Flags default to ENABLED when the key is missing or empty so the
         // site looks unchanged until the admin turns a feature off.
@@ -140,8 +191,10 @@
             </div>
         @endforeach
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Teks Promo & Navbar ============================ --}}
+    <div x-show="tab === 'promo'" x-cloak>
     <x-admin.form-section title="Teks Promo &amp; Navbar" subtitle="Banner promo atas dan tombol kontak navbar." icon="fa-bullhorn">
         <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Promo (tebal)</label>
@@ -174,8 +227,10 @@
             @error('nav_cta')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Teks Hero ============================ --}}
+    <div x-show="tab === 'hero'" x-cloak>
     <x-admin.form-section title="Teks Hero" subtitle="Judul, deskripsi, benefit, tombol, dan pesan WhatsApp hero." icon="fa-star">
         <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Badge Hero</label>
@@ -257,8 +312,10 @@
             @error('hero_wa_message')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Teks Bagian (Section) ============================ --}}
+    <div x-show="tab === 'bagian'" x-cloak>
     <x-admin.form-section title="Teks Bagian (Section)" subtitle="Eyebrow, judul, subjudul, dan status kosong tiap bagian halaman." icon="fa-heading">
         <p class="md:col-span-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Mobil / Inventory</p>
         <div>
@@ -402,8 +459,10 @@
             @error('sec_testi_subtitle')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Teks Kalkulator Kredit ============================ --}}
+    <div x-show="tab === 'kalkulator'" x-cloak>
     <x-admin.form-section title="Teks Kalkulator Kredit" subtitle="Label dan catatan pada kalkulator cicilan." icon="fa-calculator">
         <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Harga Mobil</label>
@@ -448,8 +507,10 @@
             @error('calc_footnote')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Teks Roda Keberuntungan ============================ --}}
+    <div x-show="tab === 'roda'" x-cloak>
     <x-admin.form-section title="Teks Roda Keberuntungan" subtitle="Judul, subjudul, dan tombol modal roda hadiah." icon="fa-trophy">
         <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Eyebrow Roda</label>
@@ -492,8 +553,10 @@
             @error('wheel_claim_note')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 
     {{-- ============================ Teks Footer ============================ --}}
+    <div x-show="tab === 'footer'" x-cloak>
     <x-admin.form-section title="Teks Footer" subtitle="CTA, kontak, lokasi, hak cipta, dan kredit footer." icon="fa-shoe-prints">
         <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul CTA Footer</label>
@@ -558,6 +621,7 @@
             @error('footer_credit')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+    </div>
 </div>
 
 @include('admin.partials.form-actions', ['cancel' => route('admin.settings.edit'), 'label' => 'Simpan Pengaturan'])

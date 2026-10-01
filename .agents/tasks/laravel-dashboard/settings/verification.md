@@ -77,6 +77,30 @@ Command: `php artisan test`
 - No temp files left behind.
 - Did NOT push.
 
+---
+
+# Iteration 2 — review fixes (`review.json` present, verdict CHANGES_REQUESTED)
+
+## Blocking: confirm-modal partial missing from the commit
+`resources/views/admin/partials/confirm-modal.blade.php` was untracked while the committed `layouts/admin.blade.php` had `@include('admin.partials.confirm-modal')`, so a clean checkout would fatal on every admin page.
+
+Fix and evidence:
+- Committed the partial together with the 7 CRUD `index.blade.php` `data-confirm` edits that drive it (`fix: commit confirm-modal partial and wire CRUD delete confirmation`, `a625578`). The `confirmDialog` Alpine store it relies on (`resources/js/confirm-delete.js`) was already tracked in `d25520e`.
+- `git ls-tree HEAD:resources/views/admin/partials | Select-String confirm-modal` -> `confirm-modal.blade.php` now present in HEAD.
+- `git grep -c data-confirm HEAD -- resources/views/admin/*/index.blade.php` -> all 7 index views carry `data-confirm` in HEAD.
+- `php artisan view:cache` -> `INFO Blade templates cached successfully.` This compiles every Blade template including the layout's `@include` of the confirm-modal; success proves the include resolves on a clean tree. Cache cleared again afterward (`view:clear`) to restore dev state.
+- `git status --short -- resources/views tests` -> clean (no uncommitted view/test edits remain).
+
+## Non-blocking: keep-current image precedence untested
+Added `test_updating_one_image_field_keeps_the_others` to `tests/Feature/AdminSettingTest.php` (`test: assert settings keep-current image precedence preserves other images`, `a6d99a8`). It seeds stored values for `logo`, `favicon`, `og_image`, PUTs an update that uploads only a new `favicon_file`, then asserts the favicon changed to a freshly stored `storage/uploads/...` path while `logo` and `og_image` keep their prior values.
+
+## Non-blocking: unrelated changes bundled
+The admin-layout cosmetic redesign already lived in the prior settings commit `d25520e`. This iteration confirmed the 7 CRUD `index.blade.php` edits are intentional: they replace the old `onsubmit="return confirm(...)"` with `data-confirm="..."`, which is exactly what the confirm-modal + `confirm-delete.js` consume — so they are the confirm-dialog feature and are now committed together as `a625578`, independent of the settings feature commit.
+
+## Tests after fixes
+- `php artisan test --filter=AdminSettingTest` -> **5 passed (19 assertions)**.
+- `php artisan test` (full suite, isolated SQLite) -> **54 passed (174 assertions)**, 0 failed.
+
 ## What only a real browser can confirm
 - That an actually-uploaded logo image **visually displays** in the navbar/footer `<img>` (the Blade conditional + fallback to the 'D' badge is verified; pixel rendering is not).
 - Favicon actually showing in the browser tab when a favicon is set.

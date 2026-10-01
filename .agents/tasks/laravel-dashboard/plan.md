@@ -1,226 +1,210 @@
-# Implementation Plan — Redesign Login + Admin Dashboard (Laravel 11, Daihatsu Sahabat)
+# Implementation Plan — Admin Dashboard UI Upgrades (confirm modal, advanced tables, sidebar/navbar polish)
 
-Scope is strictly the LOGIN/auth pages and the ADMIN dashboard + admin layout. The public site
-(`/`, `resources/views/home.blade.php`, `public/js/*`) is OUT OF SCOPE and keeps its own Tailwind
-CDN setup. Authentication behavior, routes, and the disabled-registration state must stay unchanged.
-Admin-facing copy stays in Bahasa Indonesia.
+## Context & key decisions (read first)
 
-## Environment / commands (Windows PowerShell)
-- Chain with `;` (NOT `&&`); `;` does NOT stop on failure, so check each command individually.
-- Tooling on PATH: `php` 8.2.12 (XAMPP), `composer` 2.9.7, `node` 24.15.0, `npm`. XAMPP MySQL running.
-- Build commands: `npm install`, then `npm run build` (vite build). Dev: `npm run dev`.
-- App serve for manual check: `php artisan serve` (http://127.0.0.1:8000). Clear caches with
-  `php artisan view:clear ; php artisan config:clear` if Blade changes don't show.
-- Admin login to test: `admin@daihatsu.test` / `password`. `/` open; `/admin` requires login;
-  `/register` must stay 404.
+Explored: `package.json`, `vite.config.js`, `resources/css/app.css`, `resources/js/app.js`,
+`tailwind.config.js`, `resources/views/layouts/admin.blade.php`, all 7
+`resources/views/admin/*/index.blade.php`, both `resources/views/admin/partials/*`, and the
+admin feature tests (`tests/Feature/AdminAccessTest.php`, `AdminCarCrudTest.php`,
+`RequestValidationTest.php`). Findings that drive the decisions below:
 
----
+- Build is Vite + Alpine 3 (global `window.Alpine`) + Chart.js. No jQuery, no CDN. Font Awesome
+  is bundled via `resources/css/app.css`. `@stack('scripts')` runs at end of `<body>` AFTER the
+  Vite bundle, so Alpine is already started when page scripts run.
+- All 7 controllers pass full collections (`->get()`), datasets tiny (9 cars, 3–6 others). No
+  pagination in controllers. CLIENT-SIDE table enhancement is correct; **no controller changes**.
+- Tests assert: routes return 200, redirects after store/update/destroy, dashboard stat labels /
+  chart ids / `window.Chart` / `build/assets/app-` present, `/register` 404. **No test asserts
+  table inner markup or the `confirm()` text.** So converting tables and replacing `confirm()` is
+  safe as long as (a) pages still render 200, (b) each delete `<form>` still POSTs
+  `admin.<entity>.destroy` with `@csrf @method('DELETE')`, (c) dashboard markup is untouched.
 
-## KEY DECISION 1 — CDN vs Vite (settled: standardize admin + auth on Vite)
+**Decision 1 — Table library: `simple-datatables` (NOT DataTables.net).** Rationale: DataTables.net
+requires jQuery, which this project deliberately does not use; adding it would regress the clean
+ESM/Vite/Alpine pipeline. `simple-datatables` (v9.x, `@fiduswriter/simple-datatables`) is a
+zero-dependency, ESM-native library bundled cleanly by Vite, and provides exactly the requested
+features: client-side search, column sorting, pagination, a "showing X of Y" label, and responsive
+layout. **jQuery is NOT needed and must not be added.**
 
-Rationale: The admin layout (`resources/views/layouts/admin.blade.php`) currently loads Tailwind via
-`https://cdn.tailwindcss.com` and Font Awesome via cdnjs, while Breeze/auth already uses
-`@vite([...])`. To bundle Chart.js and an icon set properly (purged, offline-capable, version-pinned)
-the admin area must use the Vite pipeline. This is low-risk here because:
-- `tailwind.config.js` content globs already include `./resources/views/**/*.blade.php`, so every
-  admin + auth Blade (dashboard, the 7 CRUD sections' index/create/edit, all auth views) is scanned
-  and their utility classes are compiled.
-- The public site uses a SEPARATE CDN setup inside `home.blade.php` only; it is never touched, so
-  switching the admin layout cannot regress it.
+**Decision 2 — Confirm modal: ONE global Alpine component, reused via event delegation.** Rationale:
+Alpine is already global. A single modal defined once in the admin layout, driven by a global store
+and a delegated `submit` listener on `document`, works for all 7 pages and — critically — survives
+simple-datatables re-render (search/sort/pagination move the `<form>` rows in/out of the DOM).
+Per-row Alpine `@click` bindings would break after re-render because simple-datatables rebuilds
+`<tbody>` from parsed data and strips Alpine directives; a delegated listener on `document` does not
+care that rows were re-created. This is the key correctness point.
 
-Risk to manage: after dropping `cdn.tailwindcss.com`, only classes visible in content globs are
-compiled. The CRUD views use standard palette classes (slate/blue/green/red) + inline `style=""`
-colors + `fa-solid`/`fa-regular` Font Awesome icons. Verification MUST confirm admin + CRUD pages
-render fully styled with the CDN removed (step 10). Font Awesome moves from CDN to the bundled
-`@fortawesome/fontawesome-free` package so the existing `<i class="fa-solid fa-*">` markup keeps
-working everywhere.
+**Decision 3 — Styling simple-datatables to brand:** the library ships a small base CSS; we import
+it and override its control classes (search input, pagination buttons, selectors) with brand/slate
+styles in `resources/css/app.css` using `@layer components`. simple-datatables renders fixed class
+names (`.datatable-wrapper`, `.datatable-input`, `.datatable-pagination`, `.datatable-selector`,
+`.datatable-info`, `.datatable-sorter`) so plain CSS overrides are reliable; no JS-generated Tailwind
+classes are needed, so **no Tailwind safelist additions are required** for the tables.
 
-## KEY DECISION 2 — npm packages to install
-- `chart.js@4.5.1` — charting library for the dashboard widgets (doughnut: content distribution;
-  bar: cars per category). Pairs cleanly with Alpine via a small init script. Pinned exact.
-- `@fortawesome/fontawesome-free@7.3.1` — bundled icon set replacing the cdnjs Font Awesome CDN so
-  all existing `fa-solid`/`fa-regular` icon markup (admin layout, dashboard, CRUD views, redesigned
-  login) renders from the Vite build. Pinned exact. (Font Awesome 7 keeps the `fa-solid`/`fa-regular`
-  style class names used in the codebase.)
-
-Wiring: both installed as devDependencies via `npm install -D`. Chart.js imported in
-`resources/js/app.js` and exposed for the dashboard init; Font Awesome CSS imported in
-`resources/css/app.css` via `@import '@fortawesome/fontawesome-free/css/all.min.css';`. Everything
-ships through the existing `@vite(['resources/css/app.css','resources/js/app.js'])`.
-
-## KEY DECISION 3 — Login layout
-Split-screen in the guest layout: left brand panel (Daihatsu Sahabat identity, gradient, tagline,
-hidden on mobile) + right card holding the existing login form, restyled. Keep ALL auth contracts:
-`route('login')` action, `@csrf`, field names `email`/`password`/`remember`, `autofocus`,
-`autocomplete`, `x-input-error`, `x-auth-session-status`. The guest layout change must stay
-backward-compatible for the other auth pages (forgot/reset/confirm/verify) OR those pages get the
-same treatment — chosen approach below keeps the guest layout as a two-column shell that degrades to
-a single centered card so the other auth views keep working with only light restyle.
-
-## KEY DECISION 4 — Dashboard widgets + controller data (additive)
-`DashboardController@index` keeps the existing `$counts` keys (cars, categoryStyles, quizQuestions,
-wheelPrizes, cornerImages, heroSlides, testimonials) and ADDS:
-- `carsByCategory` — `Car::selectRaw('category, COUNT(*) c')->groupBy('category')->pluck('c','category')`
-  for the bar chart.
-- `latestCars` — `Car::latest('id')->take(5)->get(['id','model','type','category','price','img'])`.
-- `latestTestimonials` — `Testimonial::latest('id')->take(5)->get(['id','name','city','car','rating'])`.
-Widgets: polished stat-card row (7 counts, Indonesian labels, icons, gradient/shadow, hover),
-a doughnut chart of overall content distribution (the 7 counts), a bar chart of cars per category,
-and a recent-items list (latest cars + latest testimonials). Chart data passed to JS via
-`@json(...)` in a `@push('scripts')` block.
+**Decision 4 — Shared table markup:** introduce a reusable Blade include
+`resources/views/admin/partials/data-table.blade.php` is NOT used (tables differ per page). Instead,
+standardize each index table by adding a shared wrapper class + a per-table `data-dt` hook attribute
+and `id`, keep each page's own `<thead>`/`<tbody>` (columns differ). A single JS module
+(`resources/js/admin-tables.js`) finds every `[data-dt]` table and initializes simple-datatables with
+shared options. This keeps the 7 pages' distinct columns/renderers intact while sharing one init.
 
 ---
 
-# Implementation Plan
+## Plan
 
-- [ ] 1. Install the two frontend packages and pin exact versions.
-      Run `npm install -D chart.js@4.5.1 @fortawesome/fontawesome-free@7.3.1` in the project root.
+- [ ] 1. Install `simple-datatables` as a dev dependency (pinned exact version).
+      Run in project root. Use `@fiduswriter/simple-datatables` (the maintained fork published to npm).
       Files: `package.json`, `package-lock.json`
-      Verify: `npm ls chart.js @fortawesome/fontawesome-free` lists both at the pinned versions with
-      exit code 0.
+      Verify: `npm ls @fiduswriter/simple-datatables` prints a single resolved version with no error.
+      Command: `npm install -D @fiduswriter/simple-datatables@9.0.5`
+      (If 9.0.5 is unavailable, pin the latest 9.x the registry resolves and note the version used.)
 
-- [ ] 2. Wire the plugins through the Vite entry files.
-      In `resources/js/app.js` import Chart.js and expose it (`import Chart from 'chart.js/auto';
-      window.Chart = Chart;`) above `Alpine.start()`. In `resources/css/app.css` add
-      `@import '@fortawesome/fontawesome-free/css/all.min.css';` ABOVE the `@tailwind` directives.
+- [ ] 2. Create the shared table init module `resources/js/admin-tables.js`.
+      Export an init function that queries `document.querySelectorAll('table[data-dt]')` and, for each,
+      constructs `new DataTable(el, { ... })` with options: `searchable: true`, `sortable: true`,
+      `perPage: 10`, `perPageSelect: [10, 25, 50]`, `labels` with Indonesian strings
+      (`placeholder: 'Cari...'`, `perPage: '{select} data per halaman'`,
+      `info: 'Menampilkan {start}–{end} dari {rows} data'`, `noRows: 'Tidak ada data'`), and
+      `columns` that disable sorting on the "Aksi" column (and image/preview columns) by reading a
+      `data-dt-nosort` attribute list from the table or by index — guard with try/catch so one bad
+      table never blocks the others. Call the init on `DOMContentLoaded`. Import the library:
+      `import { DataTable } from '@fiduswriter/simple-datatables'`.
+      Files: `resources/js/admin-tables.js`
+      Verify: compiles in step 7's build; no runtime use yet.
+
+- [ ] 3. Wire the table module + its CSS into the Vite entrypoints.
+      In `resources/js/app.js` add `import './admin-tables';` (after Alpine start is fine — the module
+      self-defers to DOMContentLoaded). In `resources/css/app.css` add, AFTER the Font Awesome import
+      and `@tailwind` directives, `@import '@fiduswriter/simple-datatables/dist/style.css';` then a
+      `@layer components { ... }` block that restyles `.datatable-wrapper`, `.datatable-top`,
+      `.datatable-bottom`, `.datatable-input`, `.datatable-selector`, `.datatable-info`,
+      `.datatable-pagination a` (brand hover/active: `bg-brand-600 text-white`), and `.datatable-sorter`
+      arrows to match the slate/brand palette. Keep the existing `[x-cloak]` rule.
       Files: `resources/js/app.js`, `resources/css/app.css`
-      Verify: `npm run build` completes with exit code 0 and writes assets under `public/build`
-      (`public/build/manifest.json` updated; a hashed `app-*.js` and `app-*.css` emitted).
+      Verify: `npm run build` (step 7) succeeds and emits the CSS/JS with the new imports.
 
-- [ ] 3. Add brand theme colors used by the redesign to the Tailwind config so compiled classes exist.
-      In `tailwind.config.js` extend `theme.extend.colors` with a `brand` scale (e.g. a Daihatsu
-      red/orange primary + supporting shades) that the login panel and dashboard gradients reference.
-      Only add colors actually used by later steps; keep existing `fontFamily` block.
-      Files: `tailwind.config.js`
-      Verify: `npm run build` exits 0 (config parses) — run after step 2 wiring is in place.
+- [ ] 4. Create the global confirmation modal partial and the delegated-submit script.
+      New partial `resources/views/admin/partials/confirm-modal.blade.php` containing: (a) an Alpine
+      component `x-data` modal (fixed overlay + centered card, brand danger styling, title/message,
+      "Batal" and "Hapus" buttons, `x-cloak`, Esc-to-close, focus the confirm button on open) bound to
+      a global store `Alpine.store('confirmDialog')`; (b) a `@push('scripts')`-free inline module OR a
+      small JS file `resources/js/confirm-delete.js` (preferred — keep JS out of Blade) that registers
+      ONE delegated listener: `document.addEventListener('submit', e => { ... })`. The listener checks
+      `e.target.matches('form[data-confirm]')`; if the form has NOT yet been confirmed
+      (`form.dataset.confirmed !== 'true'`), it calls `e.preventDefault()`, reads `data-confirm` (the
+      message), opens the Alpine store modal, and on "Hapus" sets `form.dataset.confirmed = 'true'` and
+      calls `form.requestSubmit()`; "Batal" just closes. Because the listener is on `document`, it
+      survives simple-datatables re-render, pagination, and search (rows are rebuilt but the document
+      listener persists). Register the Alpine store via `document.addEventListener('alpine:init', ...)`.
+      Files: `resources/views/admin/partials/confirm-modal.blade.php`, `resources/js/confirm-delete.js`
+      Verify: builds in step 7; behavior verified manually in step 8.
 
-- [ ] 4. Redesign the guest layout into a responsive split-screen auth shell on the Vite pipeline.
-      Rework `resources/views/layouts/guest.blade.php`: full-height two-column grid — left brand panel
-      (Daihatsu Sahabat name/logo, gradient using the brand colors, tagline, hidden `lg` and below on
-      narrow screens) and right column centering `{{ $slot }}` in a styled card. Keep
-      `@vite(['resources/css/app.css','resources/js/app.js'])`, `csrf-token` meta, and the fonts link.
-      The shell must still look correct when the slot is a plain form (so forgot/reset/confirm/verify
-      keep working). Keep `<x-application-logo>` usage valid.
-      Files: `resources/views/layouts/guest.blade.php`
-      Verify: `npm run build` exits 0; then `php artisan serve` and load `/login` in a browser — the
-      split-screen renders, brand panel left, card right; shrink the window and confirm it stacks to a
-      single centered card on mobile widths.
+- [ ] 5. Import the confirm-delete module and include the modal partial once in the admin layout.
+      In `resources/js/app.js` add `import './confirm-delete';`. In
+      `resources/views/layouts/admin.blade.php` add `@include('admin.partials.confirm-modal')` just
+      before `@stack('scripts')` (so it exists on every admin page exactly once).
+      Files: `resources/js/app.js`, `resources/views/layouts/admin.blade.php`
+      Verify: `php artisan test --filter=AdminAccess` still passes (pages render 200); full build step 7.
 
-- [ ] 5. Restyle the login view, preserving every auth contract.
-      Rework `resources/views/auth/login.blade.php` inside `<x-guest-layout>`: heading/subtitle,
-      email + password fields with leading Font Awesome icons, styled remember-me, forgot-password
-      link, full-width primary button, and the session-status + validation error blocks. MUST keep
-      the `<form method="POST" action="{{ route('login') }}">`, `@csrf`, input `name="email"`,
-      `name="password"`, `name="remember"`, `autofocus`, `autocomplete="username"` /
-      `autocomplete="current-password"`, and `<x-input-error>` / `<x-auth-session-status>` usage.
-      Reuse/restyle `x-text-input`, `x-input-label`, `x-primary-button` (restyle the component files
-      only if the change is backward-compatible for the other auth pages; prefer passing classes).
-      Files: `resources/views/auth/login.blade.php` (and, only if restyled, the shared components
-      under `resources/views/components/`)
-      Verify: `php artisan serve`; at `/login` submit WRONG credentials → validation error renders in
-      the new styling and you stay on `/login`; submit `admin@daihatsu.test` / `password` → redirect
-      to `/admin` dashboard (auth still works). Confirm `/register` still returns 404.
+- [ ] 6. Convert all 7 index pages to the shared advanced-table + modal-confirm pattern (one item, 7 files — same change pattern).
+      For EACH of the 7 index blades, apply the identical edits, preserving every existing column,
+      cell renderer (color dots, image thumbnails, star ratings, counts, `number_format`), and the
+      `@forelse/@empty` body:
+        (a) Give the `<table>` a unique `id` and the `data-dt` attribute, plus `data-dt-nosort`
+            listing the non-sortable column indexes (always the final "Aksi" column; also the
+            image/preview column for hero-slides and corner-images). Remove the outer
+            `overflow-x-auto` wrapper's reliance on it if simple-datatables adds its own scroll — keep
+            the `bg-white rounded-lg border` card wrapper.
+        (b) Replace each delete form's `onsubmit="return confirm('...')"` with
+            `data-confirm="<the same Indonesian message>"` (drop the inline `confirm()` entirely).
+            Keep `method="POST"`, `@csrf`, `@method('DELETE')`, and the destroy route unchanged.
+        (c) Restyle the top-right "Tambah ..." button from `bg-blue-600 hover:bg-blue-700` to the brand
+            palette (`bg-brand-600 hover:bg-brand-700 text-white ... rounded-lg shadow-sm`), and restyle
+            the row "Edit" (`text-brand-600`) / "Hapus" (`text-red-600`) links consistently.
+      Note the empty-state row: simple-datatables treats the single `@empty` `<td colspan>` row as data;
+      that is acceptable (shows one row "Tidak ada data"), OR guard init to skip tables whose only row
+      is the empty placeholder — the step-2 try/catch + a `data-dt` only emitted when
+      `$collection->isNotEmpty()` is the cleaner path; use `@if($collection->count()) data-dt @endif`
+      on the table so empty tables render as a plain styled table.
+      Files: `resources/views/admin/cars/index.blade.php`,
+      `resources/views/admin/testimonials/index.blade.php`,
+      `resources/views/admin/category-styles/index.blade.php`,
+      `resources/views/admin/quiz-questions/index.blade.php`,
+      `resources/views/admin/wheel-prizes/index.blade.php`,
+      `resources/views/admin/corner-images/index.blade.php`,
+      `resources/views/admin/hero-slides/index.blade.php`
+      Verify: `php artisan test --filter=Admin` passes (all 7 index pages 200, car CRUD redirects,
+      destroy still works); then build (step 7) and manual check (step 8).
 
-- [ ] 6. Confirm the other auth pages still render under the new guest shell; apply light restyle only.
-      Load forgot-password, reset-password, confirm-password, verify-email and confirm the two-column
-      shell degrades gracefully. If any looks broken, adjust those views minimally to match (headings,
-      spacing) without changing their form actions/fields.
-      Files: `resources/views/auth/forgot-password.blade.php`, `reset-password.blade.php`,
-      `confirm-password.blade.php`, `verify-email.blade.php` (only as needed)
-      Verify: `php artisan serve`; load `/forgot-password` — page renders fully styled with the new
-      shell, the email field and submit button are usable, no layout overflow.
-
-- [ ] 7. Move the admin layout off the Tailwind/Font Awesome CDN onto the Vite build and modernize it.
-      In `resources/views/layouts/admin.blade.php`: REMOVE `<script src="https://cdn.tailwindcss.com">`
-      and the cdnjs Font Awesome `<link>`; ADD `@vite(['resources/css/app.css','resources/js/app.js'])`
-      in `<head>`. Modernize the sidebar (brand header, grouped nav with the existing 8 routes and
-      `request()->routeIs()` active-state styling, keep the `fa-*` icons) and the topbar (page heading
-      + logged-in admin name/email via `Auth::user()` and a logout control). Keep the existing
-      `session('sukses')`, `session('gagal')`, `$errors` alert blocks (restyled) and `@yield('content')`,
-      `@yield('heading')`, `@stack('scripts')`. Keep the logout form posting to `route('logout')`.
+- [ ] 7. Polish the sidebar and top navbar in the admin layout.
+      Edit `resources/views/layouts/admin.blade.php` ONLY (shared layout — one change benefits all
+      pages). Keep intact: the `x-data="{ sidebarOpen: false }"` toggle + `:class` binding + mobile
+      backdrop; all 8 nav links with their exact routes and `request()->routeIs($pattern)` active
+      logic; the grouped `$navGroups` structure (Umum/Konten/Interaktif); the logout POST form(s) with
+      `@csrf`; the "Lihat Situs" link to `route('home')`; `@yield('heading')`, the session flash
+      blocks, `@yield('content')`, `@include` of the confirm modal, and `@stack('scripts')`.
+      Enhancements (presentational only):
+        - Sidebar: subtle vertical gradient (`bg-gradient-to-b from-slate-900 to-slate-950`), richer
+          active state (brand gradient pill + left accent bar), smoother hover (`hover:bg-white/5`),
+          clearer group dividers/labels, better spacing/typography, a refined brand header block.
+        - Top navbar: branded, slightly elevated sticky bar; add a breadcrumb/eyebrow line above the
+          `@yield('heading')` (e.g. "Dashboard /" + section) using the existing heading; add a header
+          action "Lihat Situs" button (links `route('home')`, `target="_blank"`); convert the avatar +
+          name block into an Alpine `x-data` user dropdown menu (profile email, a "Lihat Situs" item,
+          and the logout button inside it) while ALSO keeping a direct logout control for small screens.
+          The dropdown is new Alpine state local to the header — does not touch `sidebarOpen`.
+      Any dynamically-concatenated Tailwind classes introduced in Blade are static strings in the
+      template, so Tailwind's content scan picks them up; **no safelist change needed**. (Only add to a
+      `safelist` in `tailwind.config.js` IF a class ends up generated inside a JS string — none is
+      planned.)
       Files: `resources/views/layouts/admin.blade.php`
-      Verify: `npm run build` exits 0; `php artisan serve`; log in and load `/admin` — sidebar, topbar
-      (shows admin name/email), and icons all render with the CDN scripts gone (check page source: no
-      `cdn.tailwindcss.com`). Logout button logs out and returns to `/login`.
+      Verify: `php artisan test --filter=AdminAccess` passes (dashboard + all index pages 200, nav
+      intact); build (step 8).
 
-- [ ] 8. Extend DashboardController additively with chart + recent-items data.
-      In `app/Http/Controllers/Admin/DashboardController.php` keep `$counts` unchanged and add
-      `$carsByCategory`, `$latestCars`, `$latestTestimonials` (queries per KEY DECISION 4; import
-      `App\Models\Car`/`Testimonial` already present — add any missing use statements). Pass all via
-      `compact(...)` to the view. Do not remove or rename existing keys.
-      Files: `app/Http/Controllers/Admin/DashboardController.php`
-      Verify: `php artisan serve`; load `/admin` with no PHP error (HTTP 200) — the page still renders
-      the counts (data wiring confirmed in step 9). Optionally `php artisan tinker` to eval
-      `app(App\Http\Controllers\Admin\DashboardController::class)->index()` returns a view.
+- [ ] 8. Build assets and run the full admin test suite.
+      Run `npm run build` (REQUIRED after any CSS/JS edit — layouts load via
+      `@vite([...])`). Then run the PHP tests.
+      Files: (build output) `public/build/*`
+      Verify (run each individually — PowerShell `;` does not stop on failure):
+        - `npm run build` — completes with no error; manifest + `build/assets/app-*.css` and
+          `app-*.js` emitted.
+        - `php artisan test --filter=Admin` — all `Admin*` feature tests pass.
+        - `php artisan test` — full suite green (confirms `/register` still 404, public site, car CRUD,
+          request validation, dashboard markup unchanged).
 
-- [ ] 9. Redesign the dashboard view with stat cards, two charts, and a recent-items list.
-      Rework `resources/views/admin/dashboard.blade.php`: polished stat-card row for the 7 counts
-      (Indonesian labels Mobil, Gaya Kategori, Pertanyaan Kuis, Hadiah Roda, Gambar Pojok, Slide Hero,
-      Testimoni; icons, gradient/shadow, hover, each linking to its CRUD index as today); a doughnut
-      chart (content distribution from `$counts`) and a bar chart (`$carsByCategory`) using two
-      `<canvas>` elements initialized in a `@push('scripts')` block that reads data via `@json(...)`
-      and `window.Chart`; and a recent-items section listing `$latestCars` and `$latestTestimonials`.
-      Files: `resources/views/admin/dashboard.blade.php`
-      Verify: `php artisan serve`; load `/admin` in a browser — stat cards, BOTH charts render (no
-      console errors), and the recent-items list shows seeded cars/testimonials. Click a stat card →
-      navigates to the matching CRUD index.
+- [ ] 9. Manual smoke check in the browser (XAMPP running, login admin@daihatsu.test / password).
+      Log into `/admin`. On e.g. `/admin/cars`: confirm the table shows a search box, sortable column
+      headers, pagination with "Menampilkan X–Y dari N data", and responsive layout. Click "Hapus":
+      the Alpine modal appears (not the native `confirm()`); "Batal" cancels, "Hapus" deletes. Then
+      search/sort/paginate so rows re-render and click "Hapus" on a re-rendered row to confirm the
+      delegated listener still fires. Confirm sidebar active state, hover, group dividers, the navbar
+      breadcrumb, "Lihat Situs" action, and the user dropdown (with logout) all work, and the mobile
+      hamburger toggle + backdrop still open/close the sidebar.
+      Files: none (verification only)
+      Verify: all behaviors above observed; no console errors in devtools.
 
-- [ ] 10. Regression check: all 7 CRUD sections render fully styled with the CDN removed.
-      With only the Vite build active, open an index AND a create/edit page across the sections (at
-      minimum cars, category-styles, testimonials) and confirm tables, buttons, form inputs, badges,
-      and `fa-*` icons are styled (compiled Tailwind + bundled Font Awesome cover them). If any class
-      is missing, add it to a safelist or confirm the content glob covers the file, then rebuild.
-      Files: none expected (fix only if a regression is found)
-      Verify: `php artisan serve`; load `/admin/cars`, `/admin/cars/create`,
-      `/admin/category-styles`, `/admin/testimonials` — each renders fully styled, no raw/unstyled
-      HTML, no missing icons, flash alert styling intact after a create/update.
+## Packages added (implementation record)
+The plan assumed `@fiduswriter/simple-datatables@9.0.5`, but that scoped name does NOT exist on the
+npm registry (404). The maintained package published by the same project is the UNSCOPED
+`simple-datatables`; its current release is `10.3.0`. Packages actually added (both devDependencies):
 
-- [ ] 11. Final production build and clean verification.
-      Run `php artisan view:clear ; php artisan config:clear` then `npm run build`. Confirm the built
-      manifest references the updated `app.css`/`app.js` and that `/login`, `/admin`, and one CRUD
-      page all load correctly against the production build (stop any `npm run dev` first so Vite serves
-      the built assets, not the dev server).
-      Files: none (build artifacts under `public/build`)
-      Verify: `npm run build` exits 0; `php artisan serve`; load `/login` (split-screen),
-      log in, `/admin` (stat cards + 2 charts + recent items), and `/admin/cars` (styled table) — all
-      render from `public/build` with no CDN scripts and no console errors.
+- `simple-datatables@10.3.0` — zero-dependency, ESM-native advanced-table library (client-side
+  search, column sorting, pagination + page-size select, "Menampilkan X–Y dari N data" info line,
+  responsive). No jQuery. ESM import `{ DataTable } from 'simple-datatables'`; CSS at
+  `simple-datatables/dist/style.css`. The v10 options used (`searchable`, `sortable`, `perPage`,
+  `perPageSelect`, `labels{placeholder,perPage,noRows,noResults,info}`, `columns[{select,sortable}]`)
+  match the plan's intended API 1:1.
+- `@alpinejs/focus@3.17.4` — official Alpine plugin (version matched to the bundled `alpinejs@3.17.4`)
+  powering the confirm-modal's `x-trap.noscroll` focus trap + Esc handling, as the task requires
+  keyboard support / focus management. Registered via `Alpine.plugin(focus)` in `resources/js/app.js`.
 
----
+**jQuery was NOT added.**
 
-## Notes / assumptions
-- `User` is the standard Breeze model with `name` + `email`; the topbar reads `Auth::user()->name`
-  and `->email`.
-- Font Awesome 7 retains the `fa-solid` / `fa-regular` style classes already used across admin views,
-  so swapping the CDN for the bundled package needs no icon-markup changes. If a specific legacy icon
-  name differs in v7, pin `@fortawesome/fontawesome-free@6.5.1` instead (matches the old CDN) — decide
-  during step 10 if any icon is missing.
-- Packages are installed as devDependencies to match the existing `package.json` layout (Vite builds
-  at deploy time); switch to `dependencies` only if the deploy pipeline prunes devDependencies before
-  building.
-- Charts are initialized with vanilla `new window.Chart(canvas, {...})` in a pushed script; no extra
-  Alpine plugin is required since Alpine is already bundled.
-- The loop's stop contract is unchanged: the reviewer writes
-  `d:\DATA - AHMAD\Project\kuya\.agents\tasks\laravel-dashboard\review.json` with top-level
-  `"verdict": "APPROVED"` as its last action.
-
----
-
-## IMPLEMENTATION RESULT — packages installed (name + exact version + why)
-
-Installed as devDependencies via `npm install -D` and wired through the existing
-`@vite(['resources/css/app.css','resources/js/app.js'])` pipeline:
-
-- **chart.js@4.5.1** — charting library for the dashboard widgets. Imported in
-  `resources/js/app.js` as `import Chart from 'chart.js/auto'` and exposed as `window.Chart` so the
-  Blade `@push('scripts')` init block renders a doughnut (content distribution across the 7 counts)
-  and a bar chart (cars per category).
-- **@fortawesome/fontawesome-free@7.3.1** — bundled icon set replacing the cdnjs Font Awesome CDN
-  that the admin layout used, so every existing `fa-solid`/`fa-regular` icon (admin layout, dashboard,
-  CRUD views, redesigned login/auth pages) renders from the Vite build. Imported in
-  `resources/css/app.css` via `@import '@fortawesome/fontawesome-free/css/all.min.css';`. FA 7 keeps
-  the `fa-solid`/`fa-regular` style class names, so no icon markup changed.
-
-Both verified present via `npm ls chart.js @fortawesome/fontawesome-free` and in the production
-build output (hashed `app-*.js` includes Chart.js; `fa-*.woff2` webfonts emitted under
-`public/build/assets`). The public site (`home.blade.php`) keeps its own Tailwind CDN and was not
-touched.
+## Gaps / assumptions
+- The table library name/version differs from the plan's assumption (see "Packages added" above);
+  the resolved maintained package `simple-datatables@10.3.0` is used and recorded. No API differences
+  affect the options used here.
+- Indonesian label strings for the table controls are chosen to match the app's existing Indonesian
+  UI; wording can be adjusted without affecting behavior or tests.
+- No test asserts table internals or the confirm text, so the conversion carries no test risk beyond
+  keeping pages at 200 and destroy forms intact — both preserved by the plan.

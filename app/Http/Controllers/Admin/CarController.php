@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\HandlesBulkDestroy;
 use App\Http\Controllers\Admin\Concerns\ResolvesImageField;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CarStoreRequest;
@@ -10,7 +11,23 @@ use App\Models\Car;
 
 class CarController extends Controller
 {
+    use HandlesBulkDestroy;
     use ResolvesImageField;
+
+    protected function bulkModelClass(): string
+    {
+        return Car::class;
+    }
+
+    protected function bulkRouteName(): string
+    {
+        return 'admin.cars.index';
+    }
+
+    protected function bulkImageField(): ?string
+    {
+        return 'img';
+    }
 
     public function index()
     {

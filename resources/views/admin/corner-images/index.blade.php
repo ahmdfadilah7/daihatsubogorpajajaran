@@ -10,10 +10,18 @@
         </a>
     </div>
 
+    <div x-data="bulkSelect()">
+    @include('admin.partials.bulk-toolbar', ['route' => 'admin.corner-images.bulk-destroy'])
+
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table id="corner-images-table" @if ($cornerImages->count()) data-dt data-dt-nosort="0,3" @endif class="w-full text-sm">
+        <table id="corner-images-table" @if ($cornerImages->count()) data-dt data-dt-nosort="0,1,4" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
+                    <th class="px-4 py-3 w-10">
+                        <input type="checkbox" @change="toggleAllOnPage($event)" :checked="allOnPageChecked"
+                               class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                               aria-label="Pilih semua di halaman ini">
+                    </th>
                     <th class="px-4 py-3">Pratinjau</th>
                     <th class="px-4 py-3">Teks Alternatif</th>
                     <th class="px-4 py-3">Sumber</th>
@@ -23,6 +31,11 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($cornerImages as $img)
                     <tr>
+                        <td class="px-4 py-3">
+                            <input type="checkbox" class="row-check rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                                   value="{{ $img->id }}" @change="toggle('{{ $img->id }}')" :checked="isChecked('{{ $img->id }}')"
+                                   aria-label="Pilih {{ $img->alt }}">
+                        </td>
                         <td class="px-4 py-3">
                             <img src="{{ \Illuminate\Support\Str::startsWith($img->src, ['http://','https://']) ? $img->src : asset($img->src) }}" alt="{{ $img->alt }}" class="h-12 w-12 object-cover rounded">
                         </td>
@@ -37,9 +50,10 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">Belum ada data gambar pojok.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">Belum ada data gambar pojok.</td></tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
     </div>
 @endsection

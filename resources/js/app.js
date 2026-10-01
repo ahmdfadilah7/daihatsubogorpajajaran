@@ -17,6 +17,10 @@ Alpine.plugin(focus);
 // `alpine:init` handler, so import it BEFORE Alpine.start().
 import './confirm-delete';
 
+// Bulk-select component for the admin index pages. Registers an `alpine:init`
+// handler, so import it BEFORE Alpine.start().
+import './bulk-select';
+
 // Advanced tables (DataTables.net) on the admin index pages. Self-defers to
 // DOMContentLoaded, so import order relative to Alpine.start() does not matter.
 import './admin-tables';

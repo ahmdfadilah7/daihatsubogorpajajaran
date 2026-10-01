@@ -10,10 +10,18 @@
         </a>
     </div>
 
+    <div x-data="bulkSelect()">
+    @include('admin.partials.bulk-toolbar', ['route' => 'admin.cars.bulk-destroy'])
+
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table id="cars-table" @if ($cars->count()) data-dt data-dt-nosort="5,6" @endif class="w-full text-sm">
+        <table id="cars-table" @if ($cars->count()) data-dt data-dt-nosort="0,6,7" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
+                    <th class="px-4 py-3 w-10">
+                        <input type="checkbox" @change="toggleAllOnPage($event)" :checked="allOnPageChecked"
+                               class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                               aria-label="Pilih semua di halaman ini">
+                    </th>
                     <th class="px-4 py-3">Model</th>
                     <th class="px-4 py-3">Tipe</th>
                     <th class="px-4 py-3">Kategori</th>
@@ -26,6 +34,11 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($cars as $car)
                     <tr>
+                        <td class="px-4 py-3">
+                            <input type="checkbox" class="row-check rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                                   value="{{ $car->id }}" @change="toggle('{{ $car->id }}')" :checked="isChecked('{{ $car->id }}')"
+                                   aria-label="Pilih {{ $car->model }}">
+                        </td>
                         <td class="px-4 py-3 font-medium">{{ $car->model }}</td>
                         <td class="px-4 py-3">{{ $car->type }}</td>
                         <td class="px-4 py-3">{{ $car->category }}</td>
@@ -44,9 +57,10 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Belum ada data mobil.</td></tr>
+                    <tr><td colspan="8" class="px-4 py-6 text-center text-slate-400">Belum ada data mobil.</td></tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
     </div>
 @endsection

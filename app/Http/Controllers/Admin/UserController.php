@@ -2,15 +2,48 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\HandlesBulkDestroy;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserStoreRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    use HandlesBulkDestroy;
+
+    protected function bulkModelClass(): string
+    {
+        return User::class;
+    }
+
+    protected function bulkRouteName(): string
+    {
+        return 'admin.users.index';
+    }
+
+    /**
+     * Never delete the current user's own account in a batch. Because the
+     * acting user is always skipped and is authenticated, at least one user
+     * (self) always remains, so the last-user case is covered by this guard.
+     */
+    protected function bulkGuard(Model $model): ?string
+    {
+        if ($model->id === auth()->id()) {
+            return 'tidak dapat menghapus akun sendiri';
+        }
+
+        return null;
+    }
+
+    protected function bulkSkippedMessage(int $skippedCount): string
+    {
+        return $skippedCount.' pengguna dilewati (tidak dapat menghapus akun sendiri).';
+    }
+
     /**
      * List all user accounts.
      */

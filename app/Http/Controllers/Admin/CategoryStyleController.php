@@ -2,14 +2,45 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\HandlesBulkDestroy;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CategoryStyleStoreRequest;
 use App\Http\Requests\Admin\CategoryStyleUpdateRequest;
 use App\Models\Car;
 use App\Models\CategoryStyle;
+use Illuminate\Database\Eloquent\Model;
 
 class CategoryStyleController extends Controller
 {
+    use HandlesBulkDestroy;
+
+    protected function bulkModelClass(): string
+    {
+        return CategoryStyle::class;
+    }
+
+    protected function bulkRouteName(): string
+    {
+        return 'admin.category-styles.index';
+    }
+
+    /**
+     * Skip any category still referenced by a car (same rule as single destroy).
+     */
+    protected function bulkGuard(Model $model): ?string
+    {
+        if (Car::where('category', $model->category)->exists()) {
+            return 'masih dipakai oleh mobil';
+        }
+
+        return null;
+    }
+
+    protected function bulkSkippedMessage(int $skippedCount): string
+    {
+        return $skippedCount.' kategori dilewati (masih dipakai oleh mobil).';
+    }
+
     public function index()
     {
         $categoryStyles = CategoryStyle::orderBy('category')->get();

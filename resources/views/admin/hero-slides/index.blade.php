@@ -10,10 +10,18 @@
         </a>
     </div>
 
+    <div x-data="bulkSelect()">
+    @include('admin.partials.bulk-toolbar', ['route' => 'admin.hero-slides.bulk-destroy'])
+
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table id="hero-slides-table" @if ($heroSlides->count()) data-dt data-dt-nosort="0,4" @endif class="w-full text-sm">
+        <table id="hero-slides-table" @if ($heroSlides->count()) data-dt data-dt-nosort="0,1,5" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
+                    <th class="px-4 py-3 w-10">
+                        <input type="checkbox" @change="toggleAllOnPage($event)" :checked="allOnPageChecked"
+                               class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                               aria-label="Pilih semua di halaman ini">
+                    </th>
                     <th class="px-4 py-3">Pratinjau</th>
                     <th class="px-4 py-3">Nama</th>
                     <th class="px-4 py-3">Tag</th>
@@ -24,6 +32,11 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($heroSlides as $slide)
                     <tr>
+                        <td class="px-4 py-3">
+                            <input type="checkbox" class="row-check rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                                   value="{{ $slide->id }}" @change="toggle('{{ $slide->id }}')" :checked="isChecked('{{ $slide->id }}')"
+                                   aria-label="Pilih {{ $slide->name }}">
+                        </td>
                         <td class="px-4 py-3">
                             <img src="{{ \Illuminate\Support\Str::startsWith($slide->img, ['http://','https://']) ? $slide->img : asset($slide->img) }}" alt="{{ $slide->name }}" class="h-12 w-20 object-cover rounded">
                         </td>
@@ -39,9 +52,10 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">Belum ada data slide.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">Belum ada data slide.</td></tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
     </div>
 @endsection

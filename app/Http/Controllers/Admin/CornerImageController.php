@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\HandlesBulkDestroy;
 use App\Http\Controllers\Admin\Concerns\ResolvesImageField;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CornerImageStoreRequest;
@@ -10,7 +11,23 @@ use App\Models\CornerImage;
 
 class CornerImageController extends Controller
 {
+    use HandlesBulkDestroy;
     use ResolvesImageField;
+
+    protected function bulkModelClass(): string
+    {
+        return CornerImage::class;
+    }
+
+    protected function bulkRouteName(): string
+    {
+        return 'admin.corner-images.index';
+    }
+
+    protected function bulkImageField(): ?string
+    {
+        return 'src';
+    }
 
     public function index()
     {

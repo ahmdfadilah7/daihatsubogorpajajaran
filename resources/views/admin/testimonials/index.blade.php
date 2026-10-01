@@ -10,10 +10,18 @@
         </a>
     </div>
 
+    <div x-data="bulkSelect()">
+    @include('admin.partials.bulk-toolbar', ['route' => 'admin.testimonials.bulk-destroy'])
+
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table id="testimonials-table" @if ($testimonials->count()) data-dt data-dt-nosort="4" @endif class="w-full text-sm">
+        <table id="testimonials-table" @if ($testimonials->count()) data-dt data-dt-nosort="0,5" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
+                    <th class="px-4 py-3 w-10">
+                        <input type="checkbox" @change="toggleAllOnPage($event)" :checked="allOnPageChecked"
+                               class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                               aria-label="Pilih semua di halaman ini">
+                    </th>
                     <th class="px-4 py-3">Nama</th>
                     <th class="px-4 py-3">Kota</th>
                     <th class="px-4 py-3">Mobil</th>
@@ -24,6 +32,11 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($testimonials as $t)
                     <tr>
+                        <td class="px-4 py-3">
+                            <input type="checkbox" class="row-check rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                                   value="{{ $t->id }}" @change="toggle('{{ $t->id }}')" :checked="isChecked('{{ $t->id }}')"
+                                   aria-label="Pilih {{ $t->name }}">
+                        </td>
                         <td class="px-4 py-3 font-medium">{{ $t->name }}</td>
                         <td class="px-4 py-3">{{ $t->city }}</td>
                         <td class="px-4 py-3">{{ $t->car }}</td>
@@ -37,9 +50,10 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">Belum ada data testimoni.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">Belum ada data testimoni.</td></tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
     </div>
 @endsection

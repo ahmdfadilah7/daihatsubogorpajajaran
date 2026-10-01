@@ -30,15 +30,32 @@ Route::middleware('auth')->group(function () {
 // Admin dashboard (design B.7) — auth-protected, Indonesian UI.
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Bulk-delete routes use a STATIC `bulk-destroy` segment registered BEFORE
+    // each resource so they are not swallowed by the resource `{wildcard}`.
+    Route::delete('cars/bulk-destroy', [CarController::class, 'bulkDestroy'])->name('cars.bulk-destroy');
     Route::resource('cars', CarController::class)->except('show');
+
+    Route::delete('category-styles/bulk-destroy', [CategoryStyleController::class, 'bulkDestroy'])->name('category-styles.bulk-destroy');
     Route::resource('category-styles', CategoryStyleController::class)->except('show');
+
+    Route::delete('quiz-questions/bulk-destroy', [QuizQuestionController::class, 'bulkDestroy'])->name('quiz-questions.bulk-destroy');
     Route::resource('quiz-questions', QuizQuestionController::class)->except('show');
+
+    Route::delete('wheel-prizes/bulk-destroy', [WheelPrizeController::class, 'bulkDestroy'])->name('wheel-prizes.bulk-destroy');
     Route::resource('wheel-prizes', WheelPrizeController::class)->except('show');
+
+    Route::delete('corner-images/bulk-destroy', [CornerImageController::class, 'bulkDestroy'])->name('corner-images.bulk-destroy');
     Route::resource('corner-images', CornerImageController::class)->except('show');
+
+    Route::delete('hero-slides/bulk-destroy', [HeroSlideController::class, 'bulkDestroy'])->name('hero-slides.bulk-destroy');
     Route::resource('hero-slides', HeroSlideController::class)->except('show');
+
+    Route::delete('testimonials/bulk-destroy', [TestimonialController::class, 'bulkDestroy'])->name('testimonials.bulk-destroy');
     Route::resource('testimonials', TestimonialController::class)->except('show');
 
     // User account management (Pengguna).
+    Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
     Route::resource('users', UserController::class)->except('show');
 
     // Current user's profile (Profil).

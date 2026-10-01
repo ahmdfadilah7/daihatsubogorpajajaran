@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\HandlesBulkDestroy;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\QuizQuestionRequest;
 use App\Models\Car;
@@ -10,6 +11,18 @@ use Illuminate\Support\Facades\DB;
 
 class QuizQuestionController extends Controller
 {
+    use HandlesBulkDestroy;
+
+    protected function bulkModelClass(): string
+    {
+        return QuizQuestion::class;
+    }
+
+    protected function bulkRouteName(): string
+    {
+        return 'admin.quiz-questions.index';
+    }
+
     public function index()
     {
         $questions = QuizQuestion::withCount('options')

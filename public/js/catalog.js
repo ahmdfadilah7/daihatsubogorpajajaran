@@ -28,14 +28,14 @@ window.App = window.App || {};
         <div class="relative aspect-[4/3] overflow-hidden">
           ${badge}
           <button type="button" class="fav-btn absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 shadow text-ink-500 hover:text-brand transition-colors"
-                  aria-label="Simpan Daihatsu ${esc(car.model)} ke favorit" aria-pressed="false">
+                  aria-label="Simpan ${esc(car.model)} ke favorit" aria-pressed="false">
             <i class="fa-regular fa-heart" aria-hidden="true"></i>
           </button>
           <button type="button" class="compare-btn absolute top-16 right-4 z-10 w-10 h-10 rounded-full bg-white/90 shadow text-ink-500 hover:text-brand transition-colors" data-id="${car.id}"
-                  aria-label="Bandingkan Daihatsu ${esc(car.model)}" aria-pressed="false" title="Bandingkan">
+                  aria-label="Bandingkan ${esc(car.model)}" aria-pressed="false" title="Bandingkan">
             <i class="fa-solid fa-code-compare" aria-hidden="true"></i>
           </button>
-          <img src="${esc(car.img)}" alt="Daihatsu ${esc(car.model)} ${car.year}" loading="lazy"
+          <img src="${esc(car.img)}" alt="${esc(car.model)} ${car.year}" loading="lazy"
                class="car-img w-full h-full object-cover" onerror="this.onerror=null;this.src=FALLBACK_IMG;" />
           <div class="absolute inset-x-0 bottom-4 flex justify-center">
             <button type="button" class="detail-btn btn-fun text-white text-sm font-display font-bold px-6 py-3 rounded-full inline-flex items-center gap-2" data-id="${car.id}">
@@ -49,7 +49,7 @@ window.App = window.App || {};
             <span class="text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:${cat.bg}">${esc(cat.label)}</span>
             <span class="text-ink-500 text-xs font-semibold">${car.year}</span>
           </div>
-          <h3 class="font-display font-bold text-base text-ink mt-2.5 leading-snug">Daihatsu ${esc(car.model)}</h3>
+          <h3 class="font-display font-bold text-base text-ink mt-2.5 leading-snug">${esc(car.model)}</h3>
           <p class="text-ink-500 text-xs">${esc(car.type)}</p>
           <p class="font-display font-extrabold text-lg text-brand mt-2">${formatRupiah(car.price)}</p>
 
