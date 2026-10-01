@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             HeroSlideSeeder::class,
             TestimonialSeeder::class,
             SiteSettingSeeder::class,
+            MarqueeItemSeeder::class,
         ]);
     }
 }

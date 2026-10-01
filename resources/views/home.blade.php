@@ -261,21 +261,15 @@
              animasi menggeser sejauh lebar 1 grup -> loop mulus tanpa celah. -->
         <div class="marquee-track marquee-ltr">
           <div class="marquee-group">
-            <span class="pill" style="--pc:#0a5fd1"><i class="fa-solid fa-gas-pump"></i> Irit BBM</span>
-            <span class="pill" style="--pc:#2e86ff"><i class="fa-solid fa-shield-halved"></i> Garansi 3 Tahun</span>
-            <span class="pill" style="--pc:#ffc529"><i class="fa-solid fa-wrench"></i> Servis Mudah</span>
-            <span class="pill" style="--pc:#123a8f"><i class="fa-solid fa-hand-holding-dollar"></i> Cicilan Ringan</span>
-            <span class="pill" style="--pc:#25d366"><i class="fa-solid fa-users"></i> Nyaman Sekeluarga</span>
-            <span class="pill" style="--pc:#4aa3ff"><i class="fa-solid fa-award"></i> Dealer Resmi</span>
+            @foreach ($marqueeItems as $item)
+              <span class="pill" style="--pc:{{ $item->color }}"><i class="fa-solid {{ $item->icon }}"></i> {{ $item->text }}</span>
+            @endforeach
           </div>
           <!-- Grup kedua: salinan identik (aria-hidden karena hanya untuk loop visual) -->
           <div class="marquee-group">
-            <span class="pill" style="--pc:#0a5fd1"><i class="fa-solid fa-gas-pump"></i> Irit BBM</span>
-            <span class="pill" style="--pc:#2e86ff"><i class="fa-solid fa-shield-halved"></i> Garansi 3 Tahun</span>
-            <span class="pill" style="--pc:#ffc529"><i class="fa-solid fa-wrench"></i> Servis Mudah</span>
-            <span class="pill" style="--pc:#123a8f"><i class="fa-solid fa-hand-holding-dollar"></i> Cicilan Ringan</span>
-            <span class="pill" style="--pc:#25d366"><i class="fa-solid fa-users"></i> Nyaman Sekeluarga</span>
-            <span class="pill" style="--pc:#4aa3ff"><i class="fa-solid fa-award"></i> Dealer Resmi</span>
+            @foreach ($marqueeItems as $item)
+              <span class="pill" style="--pc:{{ $item->color }}"><i class="fa-solid {{ $item->icon }}"></i> {{ $item->text }}</span>
+            @endforeach
           </div>
         </div>
       </div>

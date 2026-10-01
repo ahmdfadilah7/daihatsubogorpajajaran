@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryStyleController;
 use App\Http\Controllers\Admin\CornerImageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\MarqueeItemController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\QuizQuestionController;
 use App\Http\Controllers\Admin\SettingController;
@@ -47,6 +48,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::delete('corner-images/bulk-destroy', [CornerImageController::class, 'bulkDestroy'])->name('corner-images.bulk-destroy');
     Route::resource('corner-images', CornerImageController::class)->except('show');
+
+    Route::delete('marquee-items/bulk-destroy', [MarqueeItemController::class, 'bulkDestroy'])->name('marquee-items.bulk-destroy');
+    Route::resource('marquee-items', MarqueeItemController::class)->except('show');
 
     Route::delete('hero-slides/bulk-destroy', [HeroSlideController::class, 'bulkDestroy'])->name('hero-slides.bulk-destroy');
     Route::resource('hero-slides', HeroSlideController::class)->except('show');

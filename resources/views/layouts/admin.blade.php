@@ -19,6 +19,7 @@
                 ['admin.category-styles.index', 'Gaya Kategori', 'fa-palette', 'admin.category-styles.*'],
                 ['admin.hero-slides.index', 'Slide Hero', 'fa-images', 'admin.hero-slides.*'],
                 ['admin.corner-images.index', 'Gambar Pojok', 'fa-image', 'admin.corner-images.*'],
+                ['admin.marquee-items.index', 'Teks Berjalan', 'fa-bullhorn', 'admin.marquee-items.*'],
             ],
             'Interaktif' => [
                 ['admin.quiz-questions.index', 'Kuis', 'fa-circle-question', 'admin.quiz-questions.*'],

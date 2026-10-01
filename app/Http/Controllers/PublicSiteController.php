@@ -6,6 +6,7 @@ use App\Models\Car;
 use App\Models\CategoryStyle;
 use App\Models\CornerImage;
 use App\Models\HeroSlide;
+use App\Models\MarqueeItem;
 use App\Models\QuizQuestion;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
@@ -115,6 +116,10 @@ class PublicSiteController extends Controller
             ->values()
             ->toArray();
 
+        // MARQUEE ITEMS — server-rendered pills for the "keunggulan berjalan"
+        // strip; ordered and passed as an Eloquent collection (no JS bootstrap).
+        $marqueeItems = MarqueeItem::orderBy('sort_order')->orderBy('id')->get();
+
         // SITE SETTINGS — resolved key-value map for <head> meta + branding.
         $settings = SiteSetting::allAsArray();
 
@@ -126,6 +131,7 @@ class PublicSiteController extends Controller
             'cornerImages',
             'heroSlides',
             'testimonials',
+            'marqueeItems',
             'settings',
         ));
     }
