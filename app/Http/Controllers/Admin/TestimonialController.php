@@ -46,10 +46,15 @@ class TestimonialController extends Controller
     public function update(TestimonialUpdateRequest $request, Testimonial $testimonial)
     {
         $data = $request->validated();
+        $old = $testimonial->img;
         $data['img'] = $this->resolveImage($request, 'img', $testimonial->img);
         unset($data['image']);
 
         $testimonial->update($data);
+
+        if ($data['img'] !== $old) {
+            $this->deleteUploadedImage($old);
+        }
 
         return redirect()->route('admin.testimonials.index')
             ->with('sukses', 'Testimoni berhasil diperbarui.');
@@ -57,7 +62,9 @@ class TestimonialController extends Controller
 
     public function destroy(Testimonial $testimonial)
     {
+        $old = $testimonial->img;
         $testimonial->delete();
+        $this->deleteUploadedImage($old);
 
         return redirect()->route('admin.testimonials.index')
             ->with('sukses', 'Testimoni berhasil dihapus.');

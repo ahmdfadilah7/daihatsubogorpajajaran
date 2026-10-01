@@ -46,10 +46,15 @@ class HeroSlideController extends Controller
     public function update(HeroSlideUpdateRequest $request, HeroSlide $heroSlide)
     {
         $data = $request->validated();
+        $old = $heroSlide->img;
         $data['img'] = $this->resolveImage($request, 'img', $heroSlide->img);
         unset($data['image']);
 
         $heroSlide->update($data);
+
+        if ($data['img'] !== $old) {
+            $this->deleteUploadedImage($old);
+        }
 
         return redirect()->route('admin.hero-slides.index')
             ->with('sukses', 'Slide hero berhasil diperbarui.');
@@ -57,7 +62,9 @@ class HeroSlideController extends Controller
 
     public function destroy(HeroSlide $heroSlide)
     {
+        $old = $heroSlide->img;
         $heroSlide->delete();
+        $this->deleteUploadedImage($old);
 
         return redirect()->route('admin.hero-slides.index')
             ->with('sukses', 'Slide hero berhasil dihapus.');

@@ -47,11 +47,16 @@ class CarController extends Controller
     public function update(CarUpdateRequest $request, Car $car)
     {
         $data = $request->validated();
+        $old = $car->img;
         $data['img'] = $this->resolveImage($request, 'img', $car->img);
         $data['features'] = $this->parseFeatures($request->input('features_text'));
         unset($data['image'], $data['features_text']);
 
         $car->update($data);
+
+        if ($data['img'] !== $old) {
+            $this->deleteUploadedImage($old);
+        }
 
         return redirect()->route('admin.cars.index')
             ->with('sukses', 'Mobil berhasil diperbarui.');
@@ -59,7 +64,9 @@ class CarController extends Controller
 
     public function destroy(Car $car)
     {
+        $old = $car->img;
         $car->delete();
+        $this->deleteUploadedImage($old);
 
         return redirect()->route('admin.cars.index')
             ->with('sukses', 'Mobil berhasil dihapus.');

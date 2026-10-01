@@ -46,10 +46,15 @@ class CornerImageController extends Controller
     public function update(CornerImageUpdateRequest $request, CornerImage $cornerImage)
     {
         $data = $request->validated();
+        $old = $cornerImage->src;
         $data['src'] = $this->resolveImage($request, 'src', $cornerImage->src);
         unset($data['image']);
 
         $cornerImage->update($data);
+
+        if ($data['src'] !== $old) {
+            $this->deleteUploadedImage($old);
+        }
 
         return redirect()->route('admin.corner-images.index')
             ->with('sukses', 'Gambar pojok berhasil diperbarui.');
@@ -57,7 +62,9 @@ class CornerImageController extends Controller
 
     public function destroy(CornerImage $cornerImage)
     {
+        $old = $cornerImage->src;
         $cornerImage->delete();
+        $this->deleteUploadedImage($old);
 
         return redirect()->route('admin.corner-images.index')
             ->with('sukses', 'Gambar pojok berhasil dihapus.');

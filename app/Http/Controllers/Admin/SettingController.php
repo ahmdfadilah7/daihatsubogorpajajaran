@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ResolvesImageField;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SettingRequest;
 use App\Models\SiteSetting;
@@ -9,6 +10,8 @@ use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
+    use ResolvesImageField;
+
     /**
      * Image fields paired with their dedicated file-input name.
      *
@@ -34,13 +37,20 @@ class SettingController extends Controller
 
         // Resolve each image field with the precedence:
         //   uploaded file ?? submitted string ?? existing stored value.
+        $replacedImages = [];
         foreach ($this->imageFields as $stringField => $fileField) {
+            $old = $existing[$stringField] ?? null;
             $data[$stringField] = $this->resolveNamedImage(
                 $request,
                 $fileField,
                 $stringField,
-                $existing[$stringField] ?? null
+                $old
             );
+            // A new upload replaced a previous uploaded file — mark the old one
+            // for deletion after the settings are persisted.
+            if ($data[$stringField] !== $old) {
+                $replacedImages[] = $old;
+            }
             unset($data[$fileField]);
         }
 
@@ -49,6 +59,10 @@ class SettingController extends Controller
         }
 
         SiteSetting::flushCache();
+
+        foreach ($replacedImages as $old) {
+            $this->deleteUploadedImage($old);
+        }
 
         return redirect()->route('admin.settings.edit')
             ->with('sukses', 'Pengaturan website berhasil disimpan.');
