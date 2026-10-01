@@ -56,6 +56,41 @@ class AdminSettingTest extends TestCase
         Storage::disk('public')->assertExists(substr($storedLogo, strlen('storage/')));
     }
 
+    public function test_updating_one_image_field_keeps_the_others(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+
+        // Seed existing stored values for all three image fields.
+        SiteSetting::updateOrCreate(['key' => 'logo'], ['value' => 'storage/uploads/logo-lama.png']);
+        SiteSetting::updateOrCreate(['key' => 'favicon'], ['value' => 'storage/uploads/favicon-lama.png']);
+        SiteSetting::updateOrCreate(['key' => 'og_image'], ['value' => 'storage/uploads/og-lama.png']);
+        SiteSetting::flushCache();
+
+        $newFavicon = UploadedFile::fake()->image('favicon-baru.png', 64, 64);
+
+        // Update ONLY the favicon; leave logo and og_image untouched.
+        $this->actingAs($user)
+            ->put(route('admin.settings.update'), [
+                'site_name' => 'Dealer Baru',
+                'meta_description' => 'Deskripsi singkat dealer baru.',
+                'favicon_file' => $newFavicon,
+            ])
+            ->assertRedirect(route('admin.settings.edit'));
+
+        SiteSetting::flushCache();
+
+        // The favicon changed to a freshly stored path.
+        $storedFavicon = SiteSetting::get('favicon');
+        $this->assertNotSame('storage/uploads/favicon-lama.png', $storedFavicon);
+        $this->assertStringStartsWith('storage/uploads/', $storedFavicon);
+        Storage::disk('public')->assertExists(substr($storedFavicon, strlen('storage/')));
+
+        // The other two image fields keep their previously stored values.
+        $this->assertSame('storage/uploads/logo-lama.png', SiteSetting::get('logo'));
+        $this->assertSame('storage/uploads/og-lama.png', SiteSetting::get('og_image'));
+    }
+
     public function test_meta_description_cannot_exceed_limit(): void
     {
         $user = User::factory()->create();
