@@ -18,6 +18,7 @@ class Car extends Model
         'seats',
         'badge',
         'description',
+        'features',
         'accent1',
         'accent2',
         'img',
@@ -29,6 +30,7 @@ class Car extends Model
         'price' => 'integer',
         'seats' => 'integer',
         'sort_order' => 'integer',
+        'features' => 'array',
     ];
 
     /**

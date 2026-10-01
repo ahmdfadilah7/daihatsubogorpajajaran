@@ -45,7 +45,8 @@ window.App = window.App || {};
     const desc = car.desc || CAT_DESC[car.category] || 'Kendaraan Daihatsu berkualitas dengan layanan purna jual terpercaya.';
     const waText = encodeURIComponent(`Halo, saya tertarik dengan Daihatsu ${car.model} ${car.type}. Bisa dibantu info & test drive?`);
 
-    const chips = HIGHLIGHTS.map((f) =>
+    const feats = (Array.isArray(car.features) && car.features.length) ? car.features : HIGHLIGHTS;
+    const chips = feats.map((f) =>
       `<span class="inline-flex items-center gap-1.5 bg-cream text-ink text-xs font-semibold px-3 py-1.5 rounded-full">
         <i class="fa-solid fa-check text-brand text-[10px]" aria-hidden="true"></i> ${esc(f)}
       </span>`).join('');

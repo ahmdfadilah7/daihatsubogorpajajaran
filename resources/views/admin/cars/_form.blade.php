@@ -83,6 +83,12 @@
             <p class="mt-1.5 text-xs text-slate-400">Tampil di panel detail mobil pada situs. Jika kosong, dipakai deskripsi umum kategori.</p>
             @error('description')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Fitur Unggulan <span class="text-slate-400">(opsional)</span></label>
+            <textarea name="features_text" rows="5" placeholder="Dual SRS Airbag&#10;Rem ABS + EBD&#10;Kamera Mundur" class="{{ $inputClass }} @error('features_text') {{ $errClass }} @enderror">{{ old('features_text', $car->features ? implode("\n", $car->features) : '') }}</textarea>
+            <p class="mt-1.5 text-xs text-slate-400">Satu fitur per baris. Tampil sebagai chip pada panel detail mobil. Jika kosong, dipakai daftar fitur umum.</p>
+            @error('features_text')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
     </x-admin.form-section>
 </div>
 

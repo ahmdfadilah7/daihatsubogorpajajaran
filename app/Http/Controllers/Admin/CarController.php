@@ -30,7 +30,8 @@ class CarController extends Controller
     {
         $data = $request->validated();
         $data['img'] = $this->resolveImage($request, 'img', null);
-        unset($data['image']);
+        $data['features'] = $this->parseFeatures($request->input('features_text'));
+        unset($data['image'], $data['features_text']);
 
         Car::create($data);
 
@@ -47,7 +48,8 @@ class CarController extends Controller
     {
         $data = $request->validated();
         $data['img'] = $this->resolveImage($request, 'img', $car->img);
-        unset($data['image']);
+        $data['features'] = $this->parseFeatures($request->input('features_text'));
+        unset($data['image'], $data['features_text']);
 
         $car->update($data);
 
@@ -61,5 +63,22 @@ class CarController extends Controller
 
         return redirect()->route('admin.cars.index')
             ->with('sukses', 'Mobil berhasil dihapus.');
+    }
+
+    /**
+     * Turn the one-feature-per-line textarea into a clean list of strings.
+     * Returns null when nothing was entered so the public fallback kicks in.
+     *
+     * @return array<int, string>|null
+     */
+    private function parseFeatures(?string $text): ?array
+    {
+        $features = collect(preg_split('/\r\n|\r|\n/', (string) $text))
+            ->map(fn ($line) => trim($line))
+            ->filter()
+            ->values()
+            ->all();
+
+        return $features ?: null;
     }
 }

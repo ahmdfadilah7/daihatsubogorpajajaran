@@ -35,6 +35,7 @@ class PublicSiteController extends Controller
                 'seats' => (int) $c->seats,
                 'badge' => $c->badge ?? '',
                 'desc' => $c->description ?? '',
+                'features' => $c->features ?? [],
                 'accent' => [$c->accent1, $c->accent2],
                 'img' => $c->img,
             ])
