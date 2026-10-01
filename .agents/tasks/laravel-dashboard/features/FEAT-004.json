@@ -1,0 +1,29 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Admin dashboard: disable registration (single seeded admin), admin layout + dashboard, and full CRUD (resource controllers + FormRequest validators + Blade views) for all 7 content groups with Indonesian labels and image-upload rules (design B.7, B.8, B.9, B.13). Depends on FEAT-001 (Breeze), FEAT-002 (models/data), FEAT-003 (so admin edits are observable on /). Delivers AC #7, #8, #10, #11.",
+  "status": "pending",
+  "steps": [
+    "Disable self-service registration (design B.7/B.13): delete the register GET and POST routes in routes/auth.php, and remove the Register/Daftar link block (@if (Route::has('register'))) from resources/views/auth/login.blade.php. Removing the route is the load-bearing step.",
+    "Create resources/views/layouts/admin.blade.php: Tailwind-CDN layout with an Indonesian sidebar (Mobil, Gaya Kategori, Kuis, Hadiah Roda, Gambar Pojok, Slide Hero, Testimoni) + logout button + Indonesian flash messages (sukses/gagal). Create app/Http/Controllers/Admin/DashboardController.php (index).",
+    "Add the admin route group in routes/web.php: Route::middleware('auth')->prefix('admin')->name('admin.')->group(...) with GET / -> dashboard and Route::resource for cars, category-styles, quiz-questions, wheel-prizes, corner-images, hero-slides, testimonials each ->except('show') (design B.7).",
+    "Create FormRequest validators (design B.9), split Store/Update where required-ness differs. Shared hex rule /^#[0-9A-Fa-f]{6}$/ for color/bg/accent1/accent2. Shared image rule: the string field (img or src) accepts http(s):// OR img/ OR storage/ (max 500); the optional upload field `image` is nullable|image|mimes:jpg,jpeg,png,webp|max:4096; on CREATE the string is required_without:image and image required_without:<string>, on UPDATE both optional (absence = keep current). Car: model/type required, category in LCGC,MPV,SUV,Niaga, year integer 1990-2100, price integer min 0, transmission in CVT,Manual,Otomatis, fuel, seats 1-20, badge nullable, accent1/accent2 hex, img+image image rules. CategoryStyle: category required+unique ignoring self (read-only on update, bg/label only), bg hex, label. QuizQuestion: question/icon required, options array min 1, options.*.text/icon required, options.*.scores nullable array, scores.*.car_model required_with max 100, scores.*.points required_with integer 0-100. WheelPrize: label/short/color(hex)/weight(int>=1)/msg. CornerImage: alt required, src+image image rules. HeroSlide: name/description/tag/price + img image rules. Testimonial: name/city/car required, rating integer 1-5, color hex, img image rules, text required. Indonesian messages.",
+    "Create the 7 Admin resource controllers (app/Http/Controllers/Admin/*Controller.php) and their Blade views (resources/views/admin/<entity>/{index,create,edit}.blade.php + a shared form partial per entity). Indonesian labels; <input type=color>+text for hex; URL text input + <input type=file> for images. On store/update resolve the image string as (uploaded file path) ?? (submitted non-empty string) ?? (existing stored value) — never null; store uploads on the public disk under uploads/ (emit storage/uploads/... path). CategoryStyleController: block delete when any car references the category (Indonesian flash warning); category read-only on edit (update mutates only bg/label). QuizQuestionController: create/edit embed repeatable options each with repeatable (model <select> populated from cars.model, points) rows; store/update sync quiz_options + quiz_option_scores inside a DB::transaction. Run `php artisan storage:link`.",
+    "Add feature tests (design B.16): GET /admin as guest redirects to /login; POST /register returns 404; authenticated create-a-car appears in GET / body; corner-image upload stores a file under public/storage and shows on /; deleting a referenced category is blocked; quiz store writes options+scores atomically and bad child input rolls back; validation rejects invalid hex accent, rating outside 1-5, negative price, missing model."
+  ],
+  "acceptance_criteria": [
+    "`php artisan route:list` shows NO register route and POST /register returns 404 (registration disabled).",
+    "GET /admin without a session redirects to /login; after logging in as the seeded admin, all 7 CRUD sections are reachable (AC #7).",
+    "Creating/editing/deleting a record in any admin section changes what renders on / after reload (AC #8).",
+    "Uploading an image for a corner image stores the file under public/storage and the public widget displays it (AC #10).",
+    "Server-side validation rejects a car with a missing model, a non-hex accent, a rating outside 1-5, or a negative price, returning the form with Indonesian error messages (AC #11).",
+    "Deleting a category still referenced by a car is blocked with an Indonesian flash; quiz store/update is atomic (bad child input rolls back the whole question)."
+  ],
+  "verification": [
+    "php artisan storage:link",
+    "php artisan route:list --path=admin (dashboard + 7 resources, each index/create/store/edit/update/destroy)",
+    "php artisan test --filter=Admin and php artisan test --filter=Request (CRUD round-trip, auth redirect, 404 register, validation, atomic quiz, blocked category delete, image upload all pass)"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Public page: PublicSiteController@home loads all 7 groups from MySQL and shapes them into the exact arrays the untouched JS modules expect; home.blade.php ports index.html verbatim (asset refs rewritten, head order + 13-script body order preserved); partials/app-data.blade.php emits the inline window.App.* = @json(...) bootstrap that replaces js/data.js (design B.6). Depends on FEAT-002 (models + seed data). Delivers AC #1-#4.",
+  "status": "pending",
+  "steps": [
+    "Create app/Http/Controllers/PublicSiteController.php with a home() method. Query every group ordered by sort_order then id (design B.11): CARS mapped to ['id','model','type','category','year'=>(int),'price'=>(int),'transmission','fuel','seats'=>(int),'badge'=>$c->badge ?? '','accent'=>[$c->accent1,$c->accent2],'img'] with NO desc key; CAT_STYLE built as a PHP ASSOCIATIVE array `CategoryStyle::all()->keyBy('category')->map(fn($s)=>['bg'=>$s->bg,'label'=>$s->label])->toArray()` — never call ->values() (would emit a JS array and break CAT_STYLE[car.category]); QUIZ nested via QuizQuestion::with('options.scores')->orderBy('sort_order') mapped to [{q,icon,options:[{t,icon,score: scores->pluck('points','car_model')}]}] with score an OBJECT map; WHEEL_PRIZES [label,short,color,weight,msg] (short keeps real \\n); CORNER_IMAGES [src,alt]; HERO_SLIDES [name,desc=>description,tag,price,img]; TESTIMONIALS [name,city,car,rating=>(int),color,img,text]. Pass all seven to the view.",
+    "Register GET / -> PublicSiteController@home as name 'home' in routes/web.php (replace the default welcome route).",
+    "Create resources/views/home.blade.php from d:\\DATA - AHMAD\\Project\\kuya\\index.html: port the markup verbatim; rewrite href/src asset refs to {{ asset('css/style.css') }}, {{ asset('js/xxx.js') }}, image refs. Keep the HEAD order EXACTLY: <script src=\"https://cdn.tailwindcss.com\"></script> then <script src=\"{{ asset('js/tailwind.config.js') }}\"></script> then <link ... css/style.css> (tailwind.config.js is a HEAD script, NOT a body module).",
+    "In the body-bottom block keep the 13-script order 1:1 but replace ONLY the first entry <script src=\"js/data.js\"></script> with @include('partials.app-data'); wrap the remaining 12 (utils, ui, hero-slider, catalog, compare, car-detail, quiz, testimonials, calculator, corner-widget, spin-wheel, main) in {{ asset('js/xxx.js') }} with order unchanged.",
+    "Create resources/views/partials/app-data.blade.php emitting exactly: <script> window.App = window.App || {}; App.CARS=@json($cars); App.CAT_STYLE=@json($catStyle); App.QUIZ=@json($quiz); App.WHEEL_PRIZES=@json($wheelPrizes); App.CORNER_IMAGES=@json($cornerImages); App.HERO_SLIDES=@json($heroSlides); App.TESTIMONIALS=@json($testimonials); </script>",
+    "Add a feature test (design B.16): GET / returns 200, body contains `App.CARS = [` with 9 car entries, contains `App.CAT_STYLE = {` and does NOT contain `App.CAT_STYLE = [`, and App.QUIZ has 4 questions."
+  ],
+  "acceptance_criteria": [
+    "GET / returns HTTP 200 and renders the full landing page (hero slider, car grid+filters, quiz, testimonials, spin wheel, corner widget) with data from MySQL, visually identical to the original static site (AC #1).",
+    "The rendered body contains `App.CARS = [` with 9 entries, each with keys id/model/type/category/year/price/transmission/fuel/seats/badge/accent/img where accent is a 2-element array (AC #2).",
+    "The rendered body contains `App.CAT_STYLE = {` (object) and NOT `App.CAT_STYLE = [` (array) (AC #3, B.16 regression guard).",
+    "App.QUIZ is 4 question objects with 14 options total and object-map score fields (AC #4).",
+    "The head loads cdn.tailwindcss.com then js/tailwind.config.js then css/style.css in that order; the 13-script body order is preserved with data.js replaced by the @include."
+  ],
+  "verification": [
+    "php artisan test --filter=Public (the GET / shape + CAT_STYLE object-not-array feature test passes)",
+    "Start `php artisan serve`; GET http://127.0.0.1:8000/ returns 200 and the body contains `App.CARS = [` and `App.CAT_STYLE = {`",
+    "Manually load / in a browser and confirm the page renders identically to index.html with no console errors"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

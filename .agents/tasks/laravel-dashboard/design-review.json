@@ -1,0 +1,46 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "id": 1,
+      "severity": "HIGH",
+      "title": "\"corner-widget.js has no onerror fallback\" is false; wrong premise justifies the NOT NULL decision",
+      "location": "B.4 (corner_images.src), B.9 (NOT NULL guarantee), B.10 (Missing uploaded file)",
+      "problem": "The design claims three times that corner-widget.js has no onerror fallback and uses this to justify src NOT NULL and the 'shows nothing broken' note. The source sets img.onerror = function(){ this.onerror=null; this.src = App.FALLBACK_IMG; }, so the widget DOES fall back to App.FALLBACK_IMG like the other image consumers.",
+      "fix": "Correct all three mentions. Keep NOT NULL but restate the rationale: a NULL src would force the FALLBACK_IMG placeholder instead of the intended corner image; drop the 'no fallback' claim and the 'shows nothing broken' line (replace with 'falls back to App.FALLBACK_IMG')."
+    },
+    {
+      "id": 2,
+      "severity": "MEDIUM",
+      "title": "Update flow with no new image can null a NOT NULL column; invariant unspecified",
+      "location": "B.9 (shared image rule / NOT NULL controller invariant), B.11",
+      "problem": "On an UPDATE where the admin edits a non-image field and submits neither a new string nor a new file, 'resolved = uploaded path ?? submitted string' yields null and the NOT NULL column rejects the save (or required_without spuriously fails). The design does not cover 'keep existing image on update'.",
+      "fix": "Specify: resolved image = uploaded file path ?? submitted non-empty string ?? existing stored value. Make the string field required_without:image only on CREATE (split Store/Update FormRequests or branch on isMethod('post')); on UPDATE both image inputs are optional and absence means keep current."
+    },
+    {
+      "id": 3,
+      "severity": "NIT",
+      "title": "CAT_STYLE query lacks orderBy, inconsistent with B.11 'every public query orders by sort_order'",
+      "location": "B.6 (CAT_STYLE mapper) vs B.11 (render-order invariant)",
+      "problem": "B.6 uses CategoryStyle::all() with no ordering while B.11 says every public query orders by sort_order and lists category among the owners. Harmless (CAT_STYLE is consumed as a keyed map, not iterated for render order) but inconsistent.",
+      "fix": "Either add ->orderBy('sort_order') before ->keyBy, or note in B.11 that CAT_STYLE is exempt because it is a keyed map, not an ordered list."
+    },
+    {
+      "id": 4,
+      "severity": "NIT",
+      "title": "car.desc read by car-detail.js is not documented as intentionally omitted from the CARS mapper",
+      "location": "B.6 (CARS field reconstruction)",
+      "problem": "car-detail.js reads car.desc || CAT_DESC[car.category] || '...'. Source CARS have no desc and the mapper correctly omits it, so behavior is preserved, but the design does not call this out, risking a future contributor adding a DB desc column and changing detail-view copy.",
+      "fix": "Add one line to B.6 CARS: no desc key is emitted (matches source); car-detail.js derives the description from CAT_DESC[category]."
+    },
+    {
+      "id": 5,
+      "severity": "NIT",
+      "title": "PowerShell bootstrap chained with ';' does not stop on failure",
+      "location": "B.15 (bootstrap commands), B.3 ('; not &&' note)",
+      "problem": "';' is a statement separator in PowerShell and runs the next command even if the prior failed, so a failed key:generate still proceeds to migrate:fresh --seed and produces a confusing secondary error.",
+      "fix": "Run/check each command individually, or guard with '; if ($LASTEXITCODE -ne 0) { break }', or use '&&' on PowerShell 7+. Document: if a step errors, stop and fix before continuing."
+    }
+  ],
+  "reviewDoc": "d:\\DATA - AHMAD\\Project\\kuya\\.agents\\tasks\\laravel-dashboard\\design-review.md"
+}

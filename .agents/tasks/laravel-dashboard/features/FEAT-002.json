@@ -1,0 +1,27 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Data layer: migrations for all 7 content tables + models/relationships + seeders reproducing the EXACT js/data.js values (design B.4, B.5, B.14). Depends on FEAT-001 (Laravel scaffold + .env). After this feature `php artisan migrate:fresh --seed` builds the schema and loads all seed data in one command (AC #7, #9).",
+  "status": "pending",
+  "steps": [
+    "Create migrations exactly per design B.4: cars (model, type, category, year smallint, price bigint, transmission, fuel, seats tinyint, badge nullable, accent1/accent2 char(7), img varchar(500) NOT NULL, sort_order int default 0); category_styles (category varchar(20) UNIQUE, bg char(7), label); quiz_questions (question, icon, sort_order); quiz_options (quiz_question_id FK cascade, text, icon, sort_order); quiz_option_scores (quiz_option_id FK cascade, car_model varchar(100), points tinyint); wheel_prizes (label, short, color char(7), weight int, msg, sort_order); corner_images (src varchar(500) NOT NULL, alt, sort_order); hero_slides (name, description, tag, price string, img varchar(500) NOT NULL, sort_order); testimonials (name, city, car, rating tinyint, color char(7), img varchar(500) NOT NULL, text, sort_order). Keep Breeze's default users/sessions/cache/jobs migrations. cars.img, hero_slides.img, testimonials.img, corner_images.src MUST be NOT NULL (design #2 fix).",
+    "Create models per design B.5 in app/Models: Car (fillable all columns; cast price/year/seats to int; `accent` accessor returning [accent1, accent2]); CategoryStyle (table category_styles); QuizQuestion (hasMany QuizOption ordered by sort_order); QuizOption (belongsTo QuizQuestion, hasMany QuizOptionScore); QuizOptionScore (belongsTo QuizOption); WheelPrize; CornerImage; HeroSlide; Testimonial.",
+    "Create seeders wired through DatabaseSeeder in this order (design B.14): AdminUserSeeder (admin@daihatsu.test, password via Hash::make('password')); CategoryStyleSeeder (LCGC/#2e86ff/Hemat, MPV/#0a5fd1/Keluarga, SUV/#123a8f/SUV, Niaga/#5b6a8c/Niaga); CarSeeder (9 rows id 1..9, accent split into accent1/accent2 copied VERBATIM from js/data.js incl. Sigra #ffc529/#f59e0b, empty badge -> NULL, sort_order = 0-based index); QuizSeeder (4 questions fa-bullseye/fa-users/fa-heart/fa-wallet, 14 options total Q1=4 Q2=3 Q3=4 Q4=3, each option's full score map from js/data.js written as quiz_option_scores rows, sort_order set on questions 0..3 and options 0-based within each question); WheelPrizeSeeder (6 rows, short with REAL \\n newline, exact colors/weights/msgs, sort_order 0..5); CornerImageSeeder (img/halo.jpeg, img/bingung.jpeg, img/hubungi.jpeg + alts, sort_order 0..2); HeroSlideSeeder (4 rows Terios/Rocky/Xenia/Ayla, desc->description, display price, sort_order 0..3); TestimonialSeeder (6 rows exact, sort_order 0..5). Every seeder sets sort_order explicitly to the 0-based js/data.js index.",
+    "Read d:\\DATA - AHMAD\\Project\\kuya\\js\\data.js directly and copy every value verbatim — do NOT re-derive from the brand palette. Enumerated car accent pairs and the full per-option quiz score maps are listed in design.md B.14 steps 3 and 4; cross-check against data.js."
+  ],
+  "acceptance_criteria": [
+    "`php artisan migrate:fresh` completes with no errors and all 7 content tables + users exist.",
+    "`php artisan migrate:fresh --seed` completes with no errors.",
+    "Row counts (via the MySQL CLI) are exactly cars=9, category_styles=4, quiz_questions=4, quiz_options=14, wheel_prizes=6, corner_images=3, hero_slides=4, testimonials=6, users=1 (design AC #9).",
+    "quiz_option_scores contains every score pair from the 14 options' score maps.",
+    "A seeded wheel_prizes.short value contains a real newline character (round-trips to split('\\n')).",
+    "A Car model instance exposes `accent` as a 2-element array."
+  ],
+  "verification": [
+    "php artisan migrate:fresh --seed",
+    "& \"D:\\DATA - AHMAD\\xampp\\mysql\\bin\\mysql.exe\" -u root -h 127.0.0.1 daihatsu_db -e \"SELECT (SELECT COUNT(*) FROM cars) cars,(SELECT COUNT(*) FROM category_styles) cat,(SELECT COUNT(*) FROM quiz_questions) q,(SELECT COUNT(*) FROM quiz_options) opt,(SELECT COUNT(*) FROM wheel_prizes) wp,(SELECT COUNT(*) FROM corner_images) ci,(SELECT COUNT(*) FROM hero_slides) hs,(SELECT COUNT(*) FROM testimonials) t,(SELECT COUNT(*) FROM users) u;\"",
+    "php artisan test --filter=Model (model/accent-shape test passes)"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
