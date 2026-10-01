@@ -29,6 +29,7 @@ class CarUpdateRequest extends FormRequest
             'fuel' => ['required', 'string', 'max:30'],
             'seats' => ['required', 'integer', 'between:1,20'],
             'badge' => ['nullable', 'string', 'max:40'],
+            'description' => ['nullable', 'string', 'max:1000'],
             'accent1' => $this->hexRule(),
             'accent2' => $this->hexRule(),
             // UPDATE: both image inputs optional (absence = keep current).
@@ -50,6 +51,7 @@ class CarUpdateRequest extends FormRequest
             'price.integer' => 'Harga harus berupa angka.',
             'transmission.in' => 'Transmisi harus CVT, Manual, atau Otomatis.',
             'seats.between' => 'Jumlah kursi harus antara 1 dan 20.',
+            'description.max' => 'Deskripsi maksimal 1000 karakter.',
             'accent1.regex' => 'Warna aksen 1 harus berupa kode hex (contoh #0a5fd1).',
             'accent2.regex' => 'Warna aksen 2 harus berupa kode hex (contoh #0a5fd1).',
             'image.image' => 'Berkas harus berupa gambar.',

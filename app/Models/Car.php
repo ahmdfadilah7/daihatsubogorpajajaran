@@ -17,6 +17,7 @@ class Car extends Model
         'fuel',
         'seats',
         'badge',
+        'description',
         'accent1',
         'accent2',
         'img',

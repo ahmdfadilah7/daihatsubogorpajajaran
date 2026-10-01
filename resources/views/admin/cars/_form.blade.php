@@ -77,6 +77,12 @@
         <div class="md:col-span-2">
             @include('admin.partials.image-input', ['name' => 'img', 'label' => 'Gambar', 'value' => $car->img])
         </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Deskripsi <span class="text-slate-400">(opsional)</span></label>
+            <textarea name="description" rows="4" placeholder="mis. Mobil keluarga yang irit dan nyaman untuk perjalanan harian." class="{{ $inputClass }} @error('description') {{ $errClass }} @enderror">{{ old('description', $car->description) }}</textarea>
+            <p class="mt-1.5 text-xs text-slate-400">Tampil di panel detail mobil pada situs. Jika kosong, dipakai deskripsi umum kategori.</p>
+            @error('description')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
     </x-admin.form-section>
 </div>
 

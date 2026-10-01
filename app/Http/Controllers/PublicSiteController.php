@@ -19,7 +19,9 @@ class PublicSiteController extends Controller
      */
     public function home()
     {
-        // CARS — ordered sort_order then id; accent as a 2-element array; NO desc key.
+        // CARS — ordered sort_order then id; accent as a 2-element array.
+        // desc comes from the DB description column (empty string when blank,
+        // car-detail.js then falls back to the generic category text).
         $cars = Car::orderBy('sort_order')->orderBy('id')->get()
             ->map(fn (Car $c) => [
                 'id' => $c->id,
@@ -32,6 +34,7 @@ class PublicSiteController extends Controller
                 'fuel' => $c->fuel,
                 'seats' => (int) $c->seats,
                 'badge' => $c->badge ?? '',
+                'desc' => $c->description ?? '',
                 'accent' => [$c->accent1, $c->accent2],
                 'img' => $c->img,
             ])
