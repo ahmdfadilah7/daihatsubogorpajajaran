@@ -4,10 +4,15 @@
 @section('heading', 'Tambah Mobil')
 
 @section('content')
-    <div class="bg-white rounded-lg border border-slate-200 p-6 max-w-3xl">
+    <x-admin.form-shell
+        title="Tambah Mobil"
+        description="Lengkapi informasi mobil baru untuk ditampilkan di situs."
+        :back="route('admin.cars.index')"
+        back-label="Kembali ke daftar"
+        icon="fa-car">
         <form action="{{ route('admin.cars.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @include('admin.cars._form')
         </form>
-    </div>
+    </x-admin.form-shell>
 @endsection
