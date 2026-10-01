@@ -140,6 +140,424 @@
             </div>
         @endforeach
     </x-admin.form-section>
+
+    {{-- ============================ Teks Promo & Navbar ============================ --}}
+    <x-admin.form-section title="Teks Promo &amp; Navbar" subtitle="Banner promo atas dan tombol kontak navbar." icon="fa-bullhorn">
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Promo (tebal)</label>
+            <input type="text" name="promo_badge" value="{{ $val('promo_badge') }}" placeholder="Promo Spesial!" class="{{ $inputClass }} @error('promo_badge') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kosongkan untuk memakai teks bawaan.</p>
+            @error('promo_badge')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Teks Promo</label>
+            <input type="text" name="promo_text" value="{{ $val('promo_text') }}" placeholder="DP mulai 15 Juta" class="{{ $inputClass }} @error('promo_text') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks utama banner promo.</p>
+            @error('promo_text')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Teks Promo Tambahan</label>
+            <input type="text" name="promo_text_extra" value="{{ $val('promo_text_extra') }}" placeholder="+ gratis servis 1 tahun." class="{{ $inputClass }} @error('promo_text_extra') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Hanya tampil di layar lebar.</p>
+            @error('promo_text_extra')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tautan Promo</label>
+            <input type="text" name="promo_cta" value="{{ $val('promo_cta') }}" placeholder="Lihat mobil →" class="{{ $inputClass }} @error('promo_cta') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks tautan ke daftar mobil. Gunakan karakter panah → bila mau.</p>
+            @error('promo_cta')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol CTA Navbar</label>
+            <input type="text" name="nav_cta" value="{{ $val('nav_cta') }}" placeholder="Hubungi Kami" class="{{ $inputClass }} @error('nav_cta') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Label tombol kontak di navbar (desktop &amp; mobile).</p>
+            @error('nav_cta')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+    </x-admin.form-section>
+
+    {{-- ============================ Teks Hero ============================ --}}
+    <x-admin.form-section title="Teks Hero" subtitle="Judul, deskripsi, benefit, tombol, dan pesan WhatsApp hero." icon="fa-star">
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Badge Hero</label>
+            <input type="text" name="hero_badge" value="{{ $val('hero_badge') }}" placeholder="PROMO" class="{{ $inputClass }} @error('hero_badge') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kosongkan untuk memakai teks bawaan.</p>
+            @error('hero_badge')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Harga Hero</label>
+            <input type="text" name="hero_price_label" value="{{ $val('hero_price_label') }}" placeholder="Mulai" class="{{ $inputClass }} @error('hero_price_label') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks di atas harga pada badge melayang.</p>
+            @error('hero_price_label')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Hitung Mundur (desktop)</label>
+            <input type="text" name="hero_countdown_label" value="{{ $val('hero_countdown_label') }}" placeholder="Promo berakhir dalam" class="{{ $inputClass }} @error('hero_countdown_label') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks sebelum timer (layar lebar).</p>
+            @error('hero_countdown_label')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Hitung Mundur (mobile)</label>
+            <input type="text" name="hero_countdown_label_short" value="{{ $val('hero_countdown_label_short') }}" placeholder="Berakhir" class="{{ $inputClass }} @error('hero_countdown_label_short') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks sebelum timer (layar kecil).</p>
+            @error('hero_countdown_label_short')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Hero (bagian 1)</label>
+            <input type="text" name="hero_title" value="{{ $val('hero_title') }}" placeholder="Mobil Keluarga" class="{{ $inputClass }} @error('hero_title') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Bagian judul sebelum kata berwarna.</p>
+            @error('hero_title')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Hero (kata berwarna)</label>
+            <input type="text" name="hero_title_hl" value="{{ $val('hero_title_hl') }}" placeholder="Ceria" class="{{ $inputClass }} @error('hero_title_hl') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kata yang disorot warna-warni.</p>
+            @error('hero_title_hl')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Hero (bagian 2)</label>
+            <input type="text" name="hero_title_suffix" value="{{ $val('hero_title_suffix') }}" placeholder="untuk Semua!" class="{{ $inputClass }} @error('hero_title_suffix') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Bagian judul setelah kata berwarna (baris kedua).</p>
+            @error('hero_title_suffix')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Deskripsi Hero</label>
+            <textarea name="hero_desc" rows="3" placeholder="Paragraf di bawah judul hero" class="{{ $inputClass }} @error('hero_desc') {{ $errClass }} @enderror">{{ $val('hero_desc') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Paragraf di bawah judul hero.</p>
+            @error('hero_desc')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Keunggulan Hero 1</label>
+            <input type="text" name="hero_benefit_1" value="{{ $val('hero_benefit_1') }}" placeholder="DP mulai 15 Juta" class="{{ $inputClass }} @error('hero_benefit_1') {{ $errClass }} @enderror">
+            @error('hero_benefit_1')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Keunggulan Hero 2</label>
+            <input type="text" name="hero_benefit_2" value="{{ $val('hero_benefit_2') }}" placeholder="Cicilan s/d 6 Tahun" class="{{ $inputClass }} @error('hero_benefit_2') {{ $errClass }} @enderror">
+            @error('hero_benefit_2')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Keunggulan Hero 3</label>
+            <input type="text" name="hero_benefit_3" value="{{ $val('hero_benefit_3') }}" placeholder="Garansi 3 Tahun" class="{{ $inputClass }} @error('hero_benefit_3') {{ $errClass }} @enderror">
+            @error('hero_benefit_3')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol Utama Hero</label>
+            <input type="text" name="hero_btn_primary" value="{{ $val('hero_btn_primary') }}" placeholder="Lihat Semua Mobil" class="{{ $inputClass }} @error('hero_btn_primary') {{ $errClass }} @enderror">
+            @error('hero_btn_primary')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol WhatsApp Hero</label>
+            <input type="text" name="hero_btn_whatsapp" value="{{ $val('hero_btn_whatsapp') }}" placeholder="Test Drive" class="{{ $inputClass }} @error('hero_btn_whatsapp') {{ $errClass }} @enderror">
+            @error('hero_btn_whatsapp')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Pesan WhatsApp Hero</label>
+            <textarea name="hero_wa_message" rows="2" placeholder="Halo, saya mau test drive mobil Daihatsu" class="{{ $inputClass }} @error('hero_wa_message') {{ $errClass }} @enderror">{{ $val('hero_wa_message') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Pesan otomatis saat klik Test Drive.</p>
+            @error('hero_wa_message')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+    </x-admin.form-section>
+
+    {{-- ============================ Teks Bagian (Section) ============================ --}}
+    <x-admin.form-section title="Teks Bagian (Section)" subtitle="Eyebrow, judul, subjudul, dan status kosong tiap bagian halaman." icon="fa-heading">
+        <p class="md:col-span-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Mobil / Inventory</p>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Eyebrow Bagian Mobil</label>
+            <input type="text" name="sec_inventory_eyebrow" value="{{ $val('sec_inventory_eyebrow') }}" placeholder="Pilihan Mobil" class="{{ $inputClass }} @error('sec_inventory_eyebrow') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kosongkan untuk memakai teks bawaan.</p>
+            @error('sec_inventory_eyebrow')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Bagian Mobil (bagian 1)</label>
+            <input type="text" name="sec_inventory_title" value="{{ $val('sec_inventory_title') }}" placeholder="Koleksi" class="{{ $inputClass }} @error('sec_inventory_title') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Sebelum kata berwarna.</p>
+            @error('sec_inventory_title')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Bagian Mobil (kata berwarna)</label>
+            <input type="text" name="sec_inventory_title_hl" value="{{ $val('sec_inventory_title_hl') }}" placeholder="Daihatsu" class="{{ $inputClass }} @error('sec_inventory_title_hl') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kata yang disorot.</p>
+            @error('sec_inventory_title_hl')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Subjudul Mobil (sebelum angka)</label>
+            <input type="text" name="sec_inventory_subtitle_pre" value="{{ $val('sec_inventory_subtitle_pre') }}" placeholder="Menampilkan" class="{{ $inputClass }} @error('sec_inventory_subtitle_pre') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks sebelum jumlah mobil (angka diisi otomatis).</p>
+            @error('sec_inventory_subtitle_pre')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Subjudul Mobil (setelah angka)</label>
+            <textarea name="sec_inventory_subtitle_post" rows="2" placeholder="mobil. Semua unit bergaransi resmi & siap antar ke rumahmu." class="{{ $inputClass }} @error('sec_inventory_subtitle_post') {{ $errClass }} @enderror">{{ $val('sec_inventory_subtitle_post') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Teks setelah jumlah mobil.</p>
+            @error('sec_inventory_subtitle_post')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Petunjuk Geser (mobile)</label>
+            <input type="text" name="inventory_swipe_hint" value="{{ $val('inventory_swipe_hint') }}" placeholder="Geser untuk melihat mobil lainnya" class="{{ $inputClass }} @error('inventory_swipe_hint') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks petunjuk geser di layar kecil.</p>
+            @error('inventory_swipe_hint')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Hasil Kosong</label>
+            <input type="text" name="inventory_empty_title" value="{{ $val('inventory_empty_title') }}" placeholder="Mobil tidak ditemukan" class="{{ $inputClass }} @error('inventory_empty_title') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Judul saat tidak ada mobil cocok filter.</p>
+            @error('inventory_empty_title')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol Reset Hasil Kosong</label>
+            <input type="text" name="inventory_empty_btn" value="{{ $val('inventory_empty_btn') }}" placeholder="Tampilkan Semua" class="{{ $inputClass }} @error('inventory_empty_btn') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Tombol untuk menampilkan semua mobil lagi.</p>
+            @error('inventory_empty_btn')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Deskripsi Hasil Kosong</label>
+            <textarea name="inventory_empty_desc" rows="2" placeholder="Coba ubah kriteria pencarian kamu." class="{{ $inputClass }} @error('inventory_empty_desc') {{ $errClass }} @enderror">{{ $val('inventory_empty_desc') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Teks di bawah judul hasil kosong.</p>
+            @error('inventory_empty_desc')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+
+        <p class="md:col-span-2 mt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Filter</p>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Filter</label>
+            <input type="text" name="filter_heading" value="{{ $val('filter_heading') }}" placeholder="Filter Mobil" class="{{ $inputClass }} @error('filter_heading') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Judul kartu filter mobil.</p>
+            @error('filter_heading')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+
+        <p class="md:col-span-2 mt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Simulasi Kredit</p>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Eyebrow Simulasi Kredit</label>
+            <input type="text" name="sec_credit_eyebrow" value="{{ $val('sec_credit_eyebrow') }}" placeholder="Simulasi Kredit" class="{{ $inputClass }} @error('sec_credit_eyebrow') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Label kecil di atas judul.</p>
+            @error('sec_credit_eyebrow')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Simulasi (bagian 1)</label>
+            <input type="text" name="sec_credit_title" value="{{ $val('sec_credit_title') }}" placeholder="Hitung Cicilan" class="{{ $inputClass }} @error('sec_credit_title') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Sebelum kata berwarna.</p>
+            @error('sec_credit_title')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Simulasi (kata berwarna)</label>
+            <input type="text" name="sec_credit_title_hl" value="{{ $val('sec_credit_title_hl') }}" placeholder="Impianmu" class="{{ $inputClass }} @error('sec_credit_title_hl') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kata yang disorot.</p>
+            @error('sec_credit_title_hl')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Subjudul Simulasi</label>
+            <textarea name="sec_credit_subtitle" rows="2" placeholder="Paragraf di bawah judul simulasi" class="{{ $inputClass }} @error('sec_credit_subtitle') {{ $errClass }} @enderror">{{ $val('sec_credit_subtitle') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Paragraf di bawah judul.</p>
+            @error('sec_credit_subtitle')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+
+        <p class="md:col-span-2 mt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Kuis</p>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Eyebrow Kuis</label>
+            <input type="text" name="sec_quiz_eyebrow" value="{{ $val('sec_quiz_eyebrow') }}" placeholder="Bingung Pilih?" class="{{ $inputClass }} @error('sec_quiz_eyebrow') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Label kecil di atas judul kuis.</p>
+            @error('sec_quiz_eyebrow')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Kuis (bagian 1)</label>
+            <input type="text" name="sec_quiz_title" value="{{ $val('sec_quiz_title') }}" placeholder="Cari Mobil" class="{{ $inputClass }} @error('sec_quiz_title') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Sebelum kata berwarna.</p>
+            @error('sec_quiz_title')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Kuis (kata berwarna)</label>
+            <input type="text" name="sec_quiz_title_hl" value="{{ $val('sec_quiz_title_hl') }}" placeholder="Idealmu" class="{{ $inputClass }} @error('sec_quiz_title_hl') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kata yang disorot.</p>
+            @error('sec_quiz_title_hl')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Subjudul Kuis</label>
+            <textarea name="sec_quiz_subtitle" rows="2" placeholder="Paragraf di bawah judul kuis" class="{{ $inputClass }} @error('sec_quiz_subtitle') {{ $errClass }} @enderror">{{ $val('sec_quiz_subtitle') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Paragraf di bawah judul kuis.</p>
+            @error('sec_quiz_subtitle')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+
+        <p class="md:col-span-2 mt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Testimoni</p>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Eyebrow Testimoni</label>
+            <input type="text" name="sec_testi_eyebrow" value="{{ $val('sec_testi_eyebrow') }}" placeholder="Kata Mereka" class="{{ $inputClass }} @error('sec_testi_eyebrow') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Label kecil di atas judul.</p>
+            @error('sec_testi_eyebrow')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Testimoni (bagian 1)</label>
+            <input type="text" name="sec_testi_title" value="{{ $val('sec_testi_title') }}" placeholder="Cerita" class="{{ $inputClass }} @error('sec_testi_title') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Sebelum kata berwarna.</p>
+            @error('sec_testi_title')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Testimoni (kata berwarna)</label>
+            <input type="text" name="sec_testi_title_hl" value="{{ $val('sec_testi_title_hl') }}" placeholder="Sahabat Daihatsu" class="{{ $inputClass }} @error('sec_testi_title_hl') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kata/frasa yang disorot.</p>
+            @error('sec_testi_title_hl')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Subjudul Testimoni</label>
+            <textarea name="sec_testi_subtitle" rows="2" placeholder="Paragraf di bawah judul testimoni" class="{{ $inputClass }} @error('sec_testi_subtitle') {{ $errClass }} @enderror">{{ $val('sec_testi_subtitle') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Paragraf di bawah judul.</p>
+            @error('sec_testi_subtitle')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+    </x-admin.form-section>
+
+    {{-- ============================ Teks Kalkulator Kredit ============================ --}}
+    <x-admin.form-section title="Teks Kalkulator Kredit" subtitle="Label dan catatan pada kalkulator cicilan." icon="fa-calculator">
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Harga Mobil</label>
+            <input type="text" name="calc_label_price" value="{{ $val('calc_label_price') }}" placeholder="Harga Mobil" class="{{ $inputClass }} @error('calc_label_price') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kosongkan untuk memakai teks bawaan.</p>
+            @error('calc_label_price')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Uang Muka</label>
+            <input type="text" name="calc_label_dp" value="{{ $val('calc_label_dp') }}" placeholder="Uang Muka (DP)" class="{{ $inputClass }} @error('calc_label_dp') {{ $errClass }} @enderror">
+            @error('calc_label_dp')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Tenor</label>
+            <input type="text" name="calc_label_tenor" value="{{ $val('calc_label_tenor') }}" placeholder="Tenor" class="{{ $inputClass }} @error('calc_label_tenor') {{ $errClass }} @enderror">
+            @error('calc_label_tenor')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Hasil Angsuran</label>
+            <input type="text" name="calc_label_result" value="{{ $val('calc_label_result') }}" placeholder="Perkiraan Angsuran / Bulan" class="{{ $inputClass }} @error('calc_label_result') {{ $errClass }} @enderror">
+            @error('calc_label_result')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Total DP</label>
+            <input type="text" name="calc_label_total_dp" value="{{ $val('calc_label_total_dp') }}" placeholder="Total DP" class="{{ $inputClass }} @error('calc_label_total_dp') {{ $errClass }} @enderror">
+            @error('calc_label_total_dp')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Total Pinjaman</label>
+            <input type="text" name="calc_label_total_loan" value="{{ $val('calc_label_total_loan') }}" placeholder="Total Pinjaman" class="{{ $inputClass }} @error('calc_label_total_loan') {{ $errClass }} @enderror">
+            @error('calc_label_total_loan')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol Ajukan Kredit</label>
+            <input type="text" name="calc_btn" value="{{ $val('calc_btn') }}" placeholder="Ajukan Kredit" class="{{ $inputClass }} @error('calc_btn') {{ $errClass }} @enderror">
+            @error('calc_btn')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Catatan Kaki Kalkulator</label>
+            <textarea name="calc_footnote" rows="2" placeholder="*Estimasi bunga flat 4%/tahun. Angka sebenarnya menyesuaikan leasing." class="{{ $inputClass }} @error('calc_footnote') {{ $errClass }} @enderror">{{ $val('calc_footnote') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Catatan kecil di bawah tombol.</p>
+            @error('calc_footnote')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+    </x-admin.form-section>
+
+    {{-- ============================ Teks Roda Keberuntungan ============================ --}}
+    <x-admin.form-section title="Teks Roda Keberuntungan" subtitle="Judul, subjudul, dan tombol modal roda hadiah." icon="fa-trophy">
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Eyebrow Roda</label>
+            <input type="text" name="wheel_eyebrow" value="{{ $val('wheel_eyebrow') }}" placeholder="Roda Keberuntungan" class="{{ $inputClass }} @error('wheel_eyebrow') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kosongkan untuk memakai teks bawaan.</p>
+            @error('wheel_eyebrow')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Roda</label>
+            <input type="text" name="wheel_title" value="{{ $val('wheel_title') }}" placeholder="Putar & Menangkan Hadiah!" class="{{ $inputClass }} @error('wheel_title') {{ $errClass }} @enderror">
+            @error('wheel_title')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Subjudul Roda</label>
+            <textarea name="wheel_subtitle" rows="2" placeholder="Coba keberuntunganmu — setiap putaran pasti dapat hadiah spesial." class="{{ $inputClass }} @error('wheel_subtitle') {{ $errClass }} @enderror">{{ $val('wheel_subtitle') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Paragraf di bawah judul modal.</p>
+            @error('wheel_subtitle')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Label Tombol Roda</label>
+            <input type="text" name="wheel_trigger_label" value="{{ $val('wheel_trigger_label') }}" placeholder="Menangkan Hadiah!" class="{{ $inputClass }} @error('wheel_trigger_label') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks tombol melayang pembuka roda.</p>
+            @error('wheel_trigger_label')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Teks Hasil Roda</label>
+            <input type="text" name="wheel_result_lead" value="{{ $val('wheel_result_lead') }}" placeholder="Selamat! Kamu mendapatkan" class="{{ $inputClass }} @error('wheel_result_lead') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks di atas nama hadiah.</p>
+            @error('wheel_result_lead')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol Klaim Hadiah</label>
+            <input type="text" name="wheel_claim_btn" value="{{ $val('wheel_claim_btn') }}" placeholder="Klaim Hadiah Sekarang" class="{{ $inputClass }} @error('wheel_claim_btn') {{ $errClass }} @enderror">
+            @error('wheel_claim_btn')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Catatan Klaim Roda</label>
+            <textarea name="wheel_claim_note" rows="2" placeholder="*Tunjukkan hadiah ini saat menghubungi kami. Berlaku selama periode promo." class="{{ $inputClass }} @error('wheel_claim_note') {{ $errClass }} @enderror">{{ $val('wheel_claim_note') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Catatan kecil di bawah tombol klaim.</p>
+            @error('wheel_claim_note')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+    </x-admin.form-section>
+
+    {{-- ============================ Teks Footer ============================ --}}
+    <x-admin.form-section title="Teks Footer" subtitle="CTA, kontak, lokasi, hak cipta, dan kredit footer." icon="fa-shoe-prints">
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul CTA Footer</label>
+            <input type="text" name="footer_cta_heading" value="{{ $val('footer_cta_heading') }}" placeholder="Siap Bawa Pulang Daihatsu Impianmu?" class="{{ $inputClass }} @error('footer_cta_heading') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Kosongkan untuk memakai teks bawaan.</p>
+            @error('footer_cta_heading')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Subjudul CTA Footer</label>
+            <textarea name="footer_cta_subtitle" rows="2" placeholder="Hubungi kami sekarang, gratis konsultasi & jadwal test drive." class="{{ $inputClass }} @error('footer_cta_subtitle') {{ $errClass }} @enderror">{{ $val('footer_cta_subtitle') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Teks di bawah judul CTA.</p>
+            @error('footer_cta_subtitle')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol WhatsApp Footer</label>
+            <input type="text" name="footer_cta_wa_label" value="{{ $val('footer_cta_wa_label') }}" placeholder="Chat WhatsApp" class="{{ $inputClass }} @error('footer_cta_wa_label') {{ $errClass }} @enderror">
+            @error('footer_cta_wa_label')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tombol Telepon Footer</label>
+            <input type="text" name="footer_cta_phone_label" value="{{ $val('footer_cta_phone_label') }}" placeholder="Telepon" class="{{ $inputClass }} @error('footer_cta_phone_label') {{ $errClass }} @enderror">
+            @error('footer_cta_phone_label')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tentang (Footer)</label>
+            <textarea name="footer_about" rows="2" placeholder="Dealer resmi Daihatsu yang menemani keluarga Indonesia sejak 2011. Sahabat di setiap perjalanan." class="{{ $inputClass }} @error('footer_about') {{ $errClass }} @enderror">{{ $val('footer_about') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Paragraf deskripsi di kolom brand.</p>
+            @error('footer_about')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Kolom Kontak</label>
+            <input type="text" name="footer_contact_heading" value="{{ $val('footer_contact_heading') }}" placeholder="Hubungi Kami" class="{{ $inputClass }} @error('footer_contact_heading') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Alamat &amp; email yang ditampilkan di footer diambil dari bagian "Kontak &amp; Lainnya".</p>
+            @error('footer_contact_heading')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Jam Operasional</label>
+            <input type="text" name="footer_hours" value="{{ $val('footer_hours') }}" placeholder="Sen – Sab, 08.00 – 20.00 WIB" class="{{ $inputClass }} @error('footer_hours') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Baris jam buka di kolom kontak.</p>
+            @error('footer_hours')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Judul Lokasi</label>
+            <input type="text" name="footer_map_heading" value="{{ $val('footer_map_heading') }}" placeholder="Lokasi Kami" class="{{ $inputClass }} @error('footer_map_heading') {{ $errClass }} @enderror">
+            @error('footer_map_heading')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tautan Peta</label>
+            <input type="text" name="footer_map_cta" value="{{ $val('footer_map_cta') }}" placeholder="Buka di Google Maps" class="{{ $inputClass }} @error('footer_map_cta') {{ $errClass }} @enderror">
+            @error('footer_map_cta')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Teks Hak Cipta</label>
+            <input type="text" name="footer_copyright" value="{{ $val('footer_copyright') }}" placeholder="All rights reserved." class="{{ $inputClass }} @error('footer_copyright') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Teks setelah "© [tahun] [nama situs].".</p>
+            @error('footer_copyright')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Teks Kredit Footer</label>
+            <textarea name="footer_credit" rows="2" placeholder="Dibuat dengan ❤ untuk keluarga Indonesia." class="{{ $inputClass }} @error('footer_credit') {{ $errClass }} @enderror">{{ $val('footer_credit') }}</textarea>
+            <p class="mt-1 text-xs text-slate-400">Baris kecil di kanan bawah footer.</p>
+            @error('footer_credit')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+    </x-admin.form-section>
 </div>
 
 @include('admin.partials.form-actions', ['cancel' => route('admin.settings.edit'), 'label' => 'Simpan Pengaturan'])

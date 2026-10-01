@@ -35,6 +35,10 @@
     $quizEnabled = $flagOn('feature_quiz');
     $cornerEnabled = $flagOn('feature_corner');
     $wheelEnabled = $flagOn('feature_wheel');
+    // Text fallback: return the stored value when present & non-empty,
+    // otherwise the current literal passed as the default. Keeps the page
+    // identical to today until an admin edits a key in Pengaturan.
+    $t = fn ($key, $default = '') => (($settings[$key] ?? '') !== '') ? $settings[$key] : $default;
   @endphp
   <meta name="description" content="{{ $sMetaDesc }}" />
   @if ($sKeywords !== '')<meta name="keywords" content="{{ $sKeywords }}" />@endif
@@ -80,9 +84,9 @@
     <div class="max-w-7xl mx-auto pl-4 pr-11 sm:px-8 h-10 flex items-center justify-center gap-2 text-center overflow-hidden">
       <i class="fa-solid fa-gift text-mango animate-pulse shrink-0" aria-hidden="true"></i>
       <p class="text-xs sm:text-sm font-medium truncate">
-        <span class="font-bold">Promo Spesial!</span> DP mulai 15 Juta
-        <span class="hidden sm:inline">+ gratis servis 1 tahun.</span>
-        <a href="#inventory" class="underline underline-offset-2 hover:text-mango font-semibold ml-1 whitespace-nowrap">Lihat mobil &rarr;</a>
+        <span class="font-bold">{{ $t('promo_badge', 'Promo Spesial!') }}</span> {{ $t('promo_text', 'DP mulai 15 Juta') }}
+        <span class="hidden sm:inline">{{ $t('promo_text_extra', '+ gratis servis 1 tahun.') }}</span>
+        <a href="#inventory" class="underline underline-offset-2 hover:text-mango font-semibold ml-1 whitespace-nowrap">{{ $t('promo_cta', 'Lihat mobil →') }}</a>
       </p>
       <button type="button" id="promoClose" class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/20 grid place-items-center transition-colors shrink-0" aria-label="Tutup banner promo">
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
@@ -121,7 +125,7 @@
 
       <!-- CTA kanan: langsung ke kontak (tanpa login) -->
       <a href="#contact" class="hidden md:inline-flex btn-fun text-sm font-semibold text-white px-5 py-2.5 rounded-full items-center gap-2">
-        <i class="fa-solid fa-headset" aria-hidden="true"></i> Hubungi Kami
+        <i class="fa-solid fa-headset" aria-hidden="true"></i> {{ $t('nav_cta', 'Hubungi Kami') }}
       </a>
 
       <button id="menuToggle" class="md:hidden w-11 h-11 rounded-xl bg-white shadow flex items-center justify-center text-ink"
@@ -140,7 +144,7 @@
         <li><a href="#contact" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Kontak</a></li>
         <li class="pt-3 mt-2 border-t border-ink/10">
           <a href="#contact" class="flex items-center justify-center gap-2 btn-fun text-white py-3 rounded-full text-sm font-semibold">
-            <i class="fa-solid fa-headset" aria-hidden="true"></i> Hubungi Kami
+            <i class="fa-solid fa-headset" aria-hidden="true"></i> {{ $t('nav_cta', 'Hubungi Kami') }}
           </a>
         </li>
       </ul>
@@ -167,36 +171,33 @@
         <div>
           <!-- Badge promo + countdown urgensi -->
           <div class="fade-up inline-flex items-center gap-2 bg-white shadow-md rounded-full pl-2 pr-3.5 py-1.5 text-xs font-semibold text-brand max-w-full">
-            <span class="bg-brand text-white px-2.5 py-1 rounded-full text-[11px] shrink-0">PROMO</span>
-            <span class="hidden sm:inline">Promo berakhir dalam</span>
-            <span class="sm:hidden">Berakhir</span>
+            <span class="bg-brand text-white px-2.5 py-1 rounded-full text-[11px] shrink-0">{{ $t('hero_badge', 'PROMO') }}</span>
+            <span class="hidden sm:inline">{{ $t('hero_countdown_label', 'Promo berakhir dalam') }}</span>
+            <span class="sm:hidden">{{ $t('hero_countdown_label_short', 'Berakhir') }}</span>
             <span id="heroCountdown" class="font-display font-extrabold text-ink tabular-nums whitespace-nowrap">--</span>
           </div>
 
-          <h1 class="fade-up delay-1 font-display font-black text-4xl sm:text-6xl lg:text-[4.2rem] leading-[1.05] mt-6 text-ink">
-            Mobil Keluarga <span class="text-rainbow">Ceria</span><br /> untuk Semua!
-          </h1>
+          <h1 class="fade-up delay-1 font-display font-black text-4xl sm:text-6xl lg:text-[4.2rem] leading-[1.05] mt-6 text-ink">{{ $t('hero_title', 'Mobil Keluarga') }} <span class="text-rainbow">{{ $t('hero_title_hl', 'Ceria') }}</span><br /> {{ $t('hero_title_suffix', 'untuk Semua!') }}</h1>
 
           <p class="fade-up delay-2 text-ink-500 text-base sm:text-lg mt-5 max-w-lg leading-relaxed">
-            Dari Ayla yang irit sampai Terios yang gagah — temukan Daihatsu impian keluargamu.
-            Cicilan ringan, servis gampang, sahabat di setiap perjalanan.
+            {{ $t('hero_desc', 'Dari Ayla yang irit sampai Terios yang gagah — temukan Daihatsu impian keluargamu. Cicilan ringan, servis gampang, sahabat di setiap perjalanan.') }}
           </p>
 
           <!-- Highlight benefit cepat -->
           <ul class="fade-up delay-2 flex flex-wrap gap-x-5 gap-y-2 mt-6 text-sm font-semibold text-ink">
-            <li class="inline-flex items-center gap-2"><i class="fa-solid fa-circle-check text-mint" aria-hidden="true"></i> DP mulai 15 Juta</li>
-            <li class="inline-flex items-center gap-2"><i class="fa-solid fa-circle-check text-mint" aria-hidden="true"></i> Cicilan s/d 6 Tahun</li>
-            <li class="inline-flex items-center gap-2"><i class="fa-solid fa-circle-check text-mint" aria-hidden="true"></i> Garansi 3 Tahun</li>
+            <li class="inline-flex items-center gap-2"><i class="fa-solid fa-circle-check text-mint" aria-hidden="true"></i> {{ $t('hero_benefit_1', 'DP mulai 15 Juta') }}</li>
+            <li class="inline-flex items-center gap-2"><i class="fa-solid fa-circle-check text-mint" aria-hidden="true"></i> {{ $t('hero_benefit_2', 'Cicilan s/d 6 Tahun') }}</li>
+            <li class="inline-flex items-center gap-2"><i class="fa-solid fa-circle-check text-mint" aria-hidden="true"></i> {{ $t('hero_benefit_3', 'Garansi 3 Tahun') }}</li>
           </ul>
 
           <div class="fade-up delay-3 flex flex-col sm:flex-row gap-4 mt-8">
             <a href="#inventory" class="btn-fun text-white font-display font-bold px-8 py-4 rounded-full inline-flex items-center justify-center gap-3">
-              Lihat Semua Mobil <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              {{ $t('hero_btn_primary', 'Lihat Semua Mobil') }} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </a>
-            <a href="https://wa.me/6281234567890?text=Halo,%20saya%20mau%20test%20drive%20mobil%20Daihatsu"
+            <a href="https://wa.me/6281234567890?text={{ rawurlencode($t('hero_wa_message', 'Halo, saya mau test drive mobil Daihatsu')) }}"
                target="_blank" rel="noopener"
                class="btn-soft text-ink font-display font-bold px-8 py-4 rounded-full inline-flex items-center justify-center gap-3">
-              <i class="fa-brands fa-whatsapp text-brand text-lg" aria-hidden="true"></i> Test Drive
+              <i class="fa-brands fa-whatsapp text-brand text-lg" aria-hidden="true"></i> {{ $t('hero_btn_whatsapp', 'Test Drive') }}
             </a>  
           </div>
 
@@ -237,7 +238,7 @@
 
           <!-- Badge kecil melayang (harga ikut berganti per slide) -->
           <div class="absolute left-2 sm:-left-6 top-8 bg-white rounded-2xl shadow-xl px-4 py-3 float-2 z-20">
-            <p class="text-xs text-ink-500">Mulai</p>
+            <p class="text-xs text-ink-500">{{ $t('hero_price_label', 'Mulai') }}</p>
             <p id="heroPrice" class="font-display font-extrabold text-brand">Rp 219 Jt</p>
           </div>
         </div>
@@ -287,12 +288,11 @@
       <div class="relative max-w-7xl mx-auto px-5 lg:px-8">
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
           <div class="reveal reveal-left">
-            <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">Pilihan Mobil</p>
-            <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">Koleksi <span class="text-rainbow">Daihatsu</span></h2>
+            <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">{{ $t('sec_inventory_eyebrow', 'Pilihan Mobil') }}</p>
+            <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">{{ $t('sec_inventory_title', 'Koleksi') }} <span class="text-rainbow">{{ $t('sec_inventory_title_hl', 'Daihatsu') }}</span></h2>
           </div>
           <p class="reveal reveal-right text-ink-500 max-w-md">
-            Menampilkan <span id="resultCount" class="text-brand font-bold">0</span> mobil.
-            Semua unit bergaransi resmi & siap antar ke rumahmu.
+            {{ $t('sec_inventory_subtitle_pre', 'Menampilkan') }} <span id="resultCount" class="text-brand font-bold">0</span> {{ $t('sec_inventory_subtitle_post', 'mobil. Semua unit bergaransi resmi & siap antar ke rumahmu.') }}
           </p>
         </div>
 
@@ -300,7 +300,7 @@
         <div aria-labelledby="searchTitle" class="bg-white rounded-3xl p-6 md:p-7 shadow-xl shadow-ink/5 border border-ink/5 mb-10 reveal">
           <div class="flex items-center justify-between mb-5">
             <h3 id="searchTitle" class="font-display font-bold text-ink text-lg flex items-center gap-2">
-              <i class="fa-solid fa-sliders text-brand" aria-hidden="true"></i> Filter Mobil
+              <i class="fa-solid fa-sliders text-brand" aria-hidden="true"></i> {{ $t('filter_heading', 'Filter Mobil') }}
             </h3>
             <button type="button" id="resetFilter" class="text-xs font-semibold text-ink-500 hover:text-brand transition-colors">
               <i class="fa-solid fa-rotate-left mr-1" aria-hidden="true"></i> Reset
@@ -357,14 +357,14 @@
         <div id="carGrid" class="car-collection" aria-live="polite"></div>
         <!-- Petunjuk geser (hanya tampil di layar kecil) -->
         <p id="swipeHint" class="sm:hidden text-center text-ink-500 text-xs mt-4">
-          <i class="fa-solid fa-arrows-left-right text-brand mr-1" aria-hidden="true"></i> Geser untuk melihat mobil lainnya
+          <i class="fa-solid fa-arrows-left-right text-brand mr-1" aria-hidden="true"></i> {{ $t('inventory_swipe_hint', 'Geser untuk melihat mobil lainnya') }}
         </p>
 
         <div id="emptyState" class="hidden text-center py-20 bg-white rounded-3xl shadow-lg">
           <i class="fa-solid fa-car-side text-5xl text-ink-500/40" aria-hidden="true"></i>
-          <h3 class="font-display font-bold text-xl text-ink mt-5">Mobil tidak ditemukan</h3>
-          <p class="text-ink-500 mt-2">Coba ubah kriteria pencarian kamu.</p>
-          <button type="button" id="emptyReset" class="btn-fun mt-6 text-white font-semibold px-6 py-3 rounded-full">Tampilkan Semua</button>
+          <h3 class="font-display font-bold text-xl text-ink mt-5">{{ $t('inventory_empty_title', 'Mobil tidak ditemukan') }}</h3>
+          <p class="text-ink-500 mt-2">{{ $t('inventory_empty_desc', 'Coba ubah kriteria pencarian kamu.') }}</p>
+          <button type="button" id="emptyReset" class="btn-fun mt-6 text-white font-semibold px-6 py-3 rounded-full">{{ $t('inventory_empty_btn', 'Tampilkan Semua') }}</button>
         </div>
       </div>
     </section>
@@ -378,9 +378,9 @@
 
       <div class="relative max-w-7xl mx-auto px-5 lg:px-8">
         <div class="text-center max-w-2xl mx-auto mb-12 reveal">
-          <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">Simulasi Kredit</p>
-          <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">Hitung Cicilan <span class="text-rainbow">Impianmu</span></h2>
-          <p class="text-ink-500 mt-5">Atur harga, uang muka, dan tenor sesukamu untuk melihat perkiraan angsuran bulanan. Gampang, cepat, tanpa perlu daftar.</p>
+          <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">{{ $t('sec_credit_eyebrow', 'Simulasi Kredit') }}</p>
+          <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">{{ $t('sec_credit_title', 'Hitung Cicilan') }} <span class="text-rainbow">{{ $t('sec_credit_title_hl', 'Impianmu') }}</span></h2>
+          <p class="text-ink-500 mt-5">{{ $t('sec_credit_subtitle', 'Atur harga, uang muka, dan tenor sesukamu untuk melihat perkiraan angsuran bulanan. Gampang, cepat, tanpa perlu daftar.') }}</p>
         </div>
 
         <!-- Kalkulator cicilan interaktif (satu card) -->
@@ -389,7 +389,7 @@
           <div class="space-y-6">
             <div>
               <div class="flex justify-between text-sm font-semibold text-ink mb-2">
-                <label for="calcPrice">Harga Mobil</label>
+                <label for="calcPrice">{{ $t('calc_label_price', 'Harga Mobil') }}</label>
                 <span id="calcPriceLabel" class="text-brand">Rp 200.000.000</span>
               </div>
               <input id="calcPrice" type="range" min="150000000" max="400000000" step="5000000" value="200000000"
@@ -397,7 +397,7 @@
             </div>
             <div>
               <div class="flex justify-between text-sm font-semibold text-ink mb-2">
-                <label for="calcDp">Uang Muka (DP)</label>
+                <label for="calcDp">{{ $t('calc_label_dp', 'Uang Muka (DP)') }}</label>
                 <span id="calcDpLabel" class="text-brand">20%</span>
               </div>
               <input id="calcDp" type="range" min="10" max="50" step="5" value="20"
@@ -405,7 +405,7 @@
             </div>
             <div>
               <div class="flex justify-between text-sm font-semibold text-ink mb-2">
-                <label for="calcTenor">Tenor</label>
+                <label for="calcTenor">{{ $t('calc_label_tenor', 'Tenor') }}</label>
                 <span id="calcTenorLabel" class="text-brand">4 Tahun</span>
               </div>
               <input id="calcTenor" type="range" min="1" max="6" step="1" value="4"
@@ -415,22 +415,22 @@
 
           <!-- Hasil perhitungan -->
           <div class="mt-8 pt-8 border-t border-ink/10 text-center">
-            <p class="text-ink-500 font-semibold text-sm">Perkiraan Angsuran / Bulan</p>
+            <p class="text-ink-500 font-semibold text-sm">{{ $t('calc_label_result', 'Perkiraan Angsuran / Bulan') }}</p>
             <p id="calcResult" class="font-display font-black text-4xl sm:text-5xl text-brand mt-2">Rp 0</p>
             <div class="mt-6 grid grid-cols-2 gap-4 text-sm max-w-md mx-auto">
               <div class="bg-cream rounded-2xl p-4">
-                <p class="text-ink-500">Total DP</p>
+                <p class="text-ink-500">{{ $t('calc_label_total_dp', 'Total DP') }}</p>
                 <p id="calcDpAmount" class="font-display font-bold text-lg text-ink mt-1">Rp 0</p>
               </div>
               <div class="bg-cream rounded-2xl p-4">
-                <p class="text-ink-500">Total Pinjaman</p>
+                <p class="text-ink-500">{{ $t('calc_label_total_loan', 'Total Pinjaman') }}</p>
                 <p id="calcLoan" class="font-display font-bold text-lg text-ink mt-1">Rp 0</p>
               </div>
             </div>
             <a href="#contact" class="mt-7 inline-flex items-center gap-2 btn-fun text-white font-display font-bold px-6 py-3 rounded-full">
-              Ajukan Kredit <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              {{ $t('calc_btn', 'Ajukan Kredit') }} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </a>
-            <p class="text-[11px] text-ink-500 mt-4">*Estimasi bunga flat 4%/tahun. Angka sebenarnya menyesuaikan leasing.</p>
+            <p class="text-[11px] text-ink-500 mt-4">{{ $t('calc_footnote', '*Estimasi bunga flat 4%/tahun. Angka sebenarnya menyesuaikan leasing.') }}</p>
           </div>
         </div>
       </div>
@@ -447,9 +447,9 @@
 
       <div class="relative max-w-3xl mx-auto px-5 lg:px-8">
         <div class="text-center max-w-2xl mx-auto mb-10 reveal">
-          <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">Bingung Pilih?</p>
-          <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">Cari Mobil <span class="text-rainbow">Idealmu</span></h2>
-          <p class="text-ink-500 mt-5">Jawab 4 pertanyaan singkat, biar kami rekomendasikan Daihatsu yang paling pas buatmu.</p>
+          <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">{{ $t('sec_quiz_eyebrow', 'Bingung Pilih?') }}</p>
+          <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">{{ $t('sec_quiz_title', 'Cari Mobil') }} <span class="text-rainbow">{{ $t('sec_quiz_title_hl', 'Idealmu') }}</span></h2>
+          <p class="text-ink-500 mt-5">{{ $t('sec_quiz_subtitle', 'Jawab 4 pertanyaan singkat, biar kami rekomendasikan Daihatsu yang paling pas buatmu.') }}</p>
         </div>
 
         <div id="quizCard" class="reveal bg-white rounded-3xl shadow-xl p-6 sm:p-10 relative overflow-hidden">
@@ -480,9 +480,9 @@
 
       <div class="relative max-w-6xl mx-auto px-5 lg:px-8">
         <div class="text-center max-w-2xl mx-auto mb-12 reveal">
-          <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">Kata Mereka</p>
-          <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">Cerita <span class="text-rainbow">Sahabat Daihatsu</span></h2>
-          <p class="text-ink-500 mt-5">Ribuan keluarga sudah mempercayakan perjalanannya pada kami. Ini kata mereka.</p>
+          <p class="text-brand font-display font-bold text-sm tracking-[.2em] uppercase">{{ $t('sec_testi_eyebrow', 'Kata Mereka') }}</p>
+          <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-ink mt-3">{{ $t('sec_testi_title', 'Cerita') }} <span class="text-rainbow">{{ $t('sec_testi_title_hl', 'Sahabat Daihatsu') }}</span></h2>
+          <p class="text-ink-500 mt-5">{{ $t('sec_testi_subtitle', 'Ribuan keluarga sudah mempercayakan perjalanannya pada kami. Ini kata mereka.') }}</p>
         </div>
 
         <!-- Spotlight testimonial slider (dirender & dikontrol oleh js/testimonials.js) -->
@@ -521,15 +521,15 @@
       <!-- CTA atas -->
       <div class="reveal bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-16 backdrop-blur">
         <div>
-          <h3 class="font-display font-extrabold text-2xl sm:text-3xl">Siap Bawa Pulang Daihatsu Impianmu?</h3>
-          <p class="text-white/70 mt-2">Hubungi kami sekarang, gratis konsultasi & jadwal test drive.</p>
+          <h3 class="font-display font-extrabold text-2xl sm:text-3xl">{{ $t('footer_cta_heading', 'Siap Bawa Pulang Daihatsu Impianmu?') }}</h3>
+          <p class="text-white/70 mt-2">{{ $t('footer_cta_subtitle', 'Hubungi kami sekarang, gratis konsultasi & jadwal test drive.') }}</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3">
           <a href="https://wa.me/6281234567890" class="btn-fun text-white font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">
-            <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i> Chat WhatsApp
+            <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i> {{ $t('footer_cta_wa_label', 'Chat WhatsApp') }}
           </a>
           <a href="tel:+622100000000" class="btn-soft text-ink font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">
-            <i class="fa-solid fa-phone" aria-hidden="true"></i> Telepon
+            <i class="fa-solid fa-phone" aria-hidden="true"></i> {{ $t('footer_cta_phone_label', 'Telepon') }}
           </a>
         </div>
       </div>
@@ -550,7 +550,7 @@
               @endif
             </span>
           </a>
-          <p class="text-white/60 mt-5 leading-relaxed max-w-sm">Dealer resmi Daihatsu yang menemani keluarga Indonesia sejak 2011. Sahabat di setiap perjalanan.</p>
+          <p class="text-white/60 mt-5 leading-relaxed max-w-sm">{{ $t('footer_about', 'Dealer resmi Daihatsu yang menemani keluarga Indonesia sejak 2011. Sahabat di setiap perjalanan.') }}</p>
           <div class="flex gap-3 mt-6">
             <a href="{{ ($settings['social_instagram'] ?? '') !== '' ? $settings['social_instagram'] : '#' }}" aria-label="Instagram" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
             <a href="{{ ($settings['social_facebook'] ?? '') !== '' ? $settings['social_facebook'] : '#' }}" aria-label="Facebook" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
@@ -560,19 +560,19 @@
         </div>
 
         <address class="not-italic lg:col-span-3 reveal" style="transition-delay:.2s">
-          <h3 class="font-display font-bold uppercase tracking-wider text-sm">Hubungi Kami</h3>
+          <h3 class="font-display font-bold uppercase tracking-wider text-sm">{{ $t('footer_contact_heading', 'Hubungi Kami') }}</h3>
           <ul class="mt-6 space-y-4 text-white/60">
-            <li class="flex gap-3"><i class="fa-solid fa-location-dot text-brand-light mt-1" aria-hidden="true"></i><span>Jl. Raya Sahabat No. 88, Jakarta</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-location-dot text-brand-light mt-1" aria-hidden="true"></i><span>{{ $t('contact_address', 'Jl. Raya Sahabat No. 88, Jakarta') }}</span></li>
             <li class="flex gap-3"><i class="fa-solid fa-phone text-brand-light mt-1" aria-hidden="true"></i><a href="tel:+622100000000" class="hover:text-white">+62 21 0000 0000</a></li>
-            <li class="flex gap-3"><i class="fa-solid fa-envelope text-brand-light mt-1" aria-hidden="true"></i><a href="mailto:halo@example.com" class="hover:text-white">halo@example.com</a></li>
-            <li class="flex gap-3"><i class="fa-regular fa-clock text-brand-light mt-1" aria-hidden="true"></i><span>Sen – Sab, 08.00 – 20.00 WIB</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-envelope text-brand-light mt-1" aria-hidden="true"></i><a href="mailto:{{ $t('contact_email', 'halo@example.com') }}" class="hover:text-white">{{ $t('contact_email', 'halo@example.com') }}</a></li>
+            <li class="flex gap-3"><i class="fa-regular fa-clock text-brand-light mt-1" aria-hidden="true"></i><span>{{ $t('footer_hours', 'Sen – Sab, 08.00 – 20.00 WIB') }}</span></li>
           </ul>
         </address>
 
         <!-- Lokasi showroom (Google Maps) -->
         <div class="sm:col-span-2 lg:col-span-5 reveal" style="transition-delay:.3s">
           <h3 class="font-display font-bold uppercase tracking-wider text-sm flex items-center gap-2">
-            <i class="fa-solid fa-map-location-dot text-brand-light" aria-hidden="true"></i> Lokasi Kami
+            <i class="fa-solid fa-map-location-dot text-brand-light" aria-hidden="true"></i> {{ $t('footer_map_heading', 'Lokasi Kami') }}
           </h3>
           <div class="rounded-2xl overflow-hidden border border-white/10 shadow-lg">
             <iframe
@@ -584,14 +584,14 @@
           </div>
           <a href="https://www.google.com/maps?q=Jl.+Jenderal+Sudirman,+Jakarta" target="_blank" rel="noopener"
              class="inline-flex items-center gap-2 text-brand-light text-sm font-semibold mt-3 hover:text-white transition-colors">
-            <i class="fa-solid fa-diamond-turn-right" aria-hidden="true"></i> Buka di Google Maps
+            <i class="fa-solid fa-diamond-turn-right" aria-hidden="true"></i> {{ $t('footer_map_cta', 'Buka di Google Maps') }}
           </a>
         </div>
       </div>
 
       <div class="mt-14 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/50">
-        <p>&copy; <span id="year"></span> {{ $sName }}. All rights reserved.</p>
-        <p>Dibuat dengan <i class="fa-solid fa-heart text-brand-light" aria-hidden="true"></i><span class="sr-only">cinta</span> untuk keluarga Indonesia.</p>
+        <p>&copy; <span id="year"></span> {{ $sName }}. {{ $t('footer_copyright', 'All rights reserved.') }}</p>
+        <p><span aria-label="Dibuat dengan cinta untuk keluarga Indonesia">{{ $t('footer_credit', 'Dibuat dengan ❤ untuk keluarga Indonesia.') }}</span></p>
       </div>
     </div>
   </footer>
@@ -653,7 +653,7 @@
   @if ($wheelEnabled)
   <button type="button" id="spinTrigger" class="spin-trigger" aria-label="Main roda keberuntungan">
     <i class="fa-solid fa-gift" aria-hidden="true"></i>
-    <span class="spin-trigger-label">Menangkan Hadiah!</span>
+    <span class="spin-trigger-label">{{ $t('wheel_trigger_label', 'Menangkan Hadiah!') }}</span>
   </button>
 
   <div id="spinOverlay" class="spin-overlay" hidden>
@@ -663,9 +663,9 @@
       </button>
 
       <div class="text-center">
-        <p class="text-brand font-display font-bold text-xs tracking-[.2em] uppercase">Roda Keberuntungan</p>
-        <h2 id="spinTitle" class="font-display font-extrabold text-2xl sm:text-3xl text-ink mt-1">Putar & Menangkan Hadiah!</h2>
-        <p class="text-ink-500 text-sm mt-2">Coba keberuntunganmu — setiap putaran pasti dapat hadiah spesial.</p>
+        <p class="text-brand font-display font-bold text-xs tracking-[.2em] uppercase">{{ $t('wheel_eyebrow', 'Roda Keberuntungan') }}</p>
+        <h2 id="spinTitle" class="font-display font-extrabold text-2xl sm:text-3xl text-ink mt-1">{{ $t('wheel_title', 'Putar & Menangkan Hadiah!') }}</h2>
+        <p class="text-ink-500 text-sm mt-2">{{ $t('wheel_subtitle', 'Coba keberuntunganmu — setiap putaran pasti dapat hadiah spesial.') }}</p>
       </div>
 
       <!-- Roda -->
@@ -677,13 +677,13 @@
 
       <!-- Hasil -->
       <div id="spinResult" class="spin-result" hidden>
-        <p class="text-ink-500 text-sm">Selamat! Kamu mendapatkan</p>
+        <p class="text-ink-500 text-sm">{{ $t('wheel_result_lead', 'Selamat! Kamu mendapatkan') }}</p>
         <p id="spinPrize" class="font-display font-black text-2xl text-brand mt-1">-</p>
         <a id="spinClaim" href="#" target="_blank" rel="noopener"
            class="btn-fun text-white font-display font-bold px-6 py-3 rounded-full inline-flex items-center gap-2 mt-4">
-          <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i> Klaim Hadiah Sekarang
+          <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i> {{ $t('wheel_claim_btn', 'Klaim Hadiah Sekarang') }}
         </a>
-        <p class="text-ink-500 text-[11px] mt-3">*Tunjukkan hadiah ini saat menghubungi kami. Berlaku selama periode promo.</p>
+        <p class="text-ink-500 text-[11px] mt-3">{{ $t('wheel_claim_note', '*Tunjukkan hadiah ini saat menghubungi kami. Berlaku selama periode promo.') }}</p>
       </div>
     </div>
   </div>

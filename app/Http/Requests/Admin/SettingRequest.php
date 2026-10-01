@@ -52,6 +52,85 @@ class SettingRequest extends FormRequest
             'feature_quiz' => ['nullable', 'in:0,1'],
             'feature_corner' => ['nullable', 'in:0,1'],
             'feature_wheel' => ['nullable', 'in:0,1'],
+
+            // === Teks Halaman Publik (67 keys) ===
+            // A — Promo
+            'promo_badge' => ['nullable', 'string', 'max:255'],
+            'promo_text' => ['nullable', 'string', 'max:255'],
+            'promo_text_extra' => ['nullable', 'string', 'max:255'],
+            'promo_cta' => ['nullable', 'string', 'max:255'],
+            // B — Navbar
+            'nav_cta' => ['nullable', 'string', 'max:255'],
+            // C — Hero
+            'hero_badge' => ['nullable', 'string', 'max:255'],
+            'hero_countdown_label' => ['nullable', 'string', 'max:255'],
+            'hero_countdown_label_short' => ['nullable', 'string', 'max:255'],
+            'hero_title' => ['nullable', 'string', 'max:255'],
+            'hero_title_hl' => ['nullable', 'string', 'max:255'],
+            'hero_title_suffix' => ['nullable', 'string', 'max:255'],
+            'hero_desc' => ['nullable', 'string', 'max:1000'],
+            'hero_benefit_1' => ['nullable', 'string', 'max:255'],
+            'hero_benefit_2' => ['nullable', 'string', 'max:255'],
+            'hero_benefit_3' => ['nullable', 'string', 'max:255'],
+            'hero_btn_primary' => ['nullable', 'string', 'max:255'],
+            'hero_btn_whatsapp' => ['nullable', 'string', 'max:255'],
+            'hero_wa_message' => ['nullable', 'string', 'max:500'],
+            'hero_price_label' => ['nullable', 'string', 'max:255'],
+            // D — Inventory
+            'sec_inventory_eyebrow' => ['nullable', 'string', 'max:255'],
+            'sec_inventory_title' => ['nullable', 'string', 'max:255'],
+            'sec_inventory_title_hl' => ['nullable', 'string', 'max:255'],
+            'sec_inventory_subtitle_pre' => ['nullable', 'string', 'max:255'],
+            'sec_inventory_subtitle_post' => ['nullable', 'string', 'max:1000'],
+            'inventory_swipe_hint' => ['nullable', 'string', 'max:255'],
+            'inventory_empty_title' => ['nullable', 'string', 'max:255'],
+            'inventory_empty_desc' => ['nullable', 'string', 'max:1000'],
+            'inventory_empty_btn' => ['nullable', 'string', 'max:255'],
+            // E — Filter
+            'filter_heading' => ['nullable', 'string', 'max:255'],
+            // F — Credit calculator
+            'sec_credit_eyebrow' => ['nullable', 'string', 'max:255'],
+            'sec_credit_title' => ['nullable', 'string', 'max:255'],
+            'sec_credit_title_hl' => ['nullable', 'string', 'max:255'],
+            'sec_credit_subtitle' => ['nullable', 'string', 'max:1000'],
+            'calc_label_price' => ['nullable', 'string', 'max:255'],
+            'calc_label_dp' => ['nullable', 'string', 'max:255'],
+            'calc_label_tenor' => ['nullable', 'string', 'max:255'],
+            'calc_label_result' => ['nullable', 'string', 'max:255'],
+            'calc_label_total_dp' => ['nullable', 'string', 'max:255'],
+            'calc_label_total_loan' => ['nullable', 'string', 'max:255'],
+            'calc_btn' => ['nullable', 'string', 'max:255'],
+            'calc_footnote' => ['nullable', 'string', 'max:1000'],
+            // G — Quiz
+            'sec_quiz_eyebrow' => ['nullable', 'string', 'max:255'],
+            'sec_quiz_title' => ['nullable', 'string', 'max:255'],
+            'sec_quiz_title_hl' => ['nullable', 'string', 'max:255'],
+            'sec_quiz_subtitle' => ['nullable', 'string', 'max:1000'],
+            // H — Testimoni
+            'sec_testi_eyebrow' => ['nullable', 'string', 'max:255'],
+            'sec_testi_title' => ['nullable', 'string', 'max:255'],
+            'sec_testi_title_hl' => ['nullable', 'string', 'max:255'],
+            'sec_testi_subtitle' => ['nullable', 'string', 'max:1000'],
+            // I — Spin wheel
+            'wheel_eyebrow' => ['nullable', 'string', 'max:255'],
+            'wheel_title' => ['nullable', 'string', 'max:255'],
+            'wheel_subtitle' => ['nullable', 'string', 'max:1000'],
+            'wheel_trigger_label' => ['nullable', 'string', 'max:255'],
+            'wheel_result_lead' => ['nullable', 'string', 'max:255'],
+            'wheel_claim_btn' => ['nullable', 'string', 'max:255'],
+            'wheel_claim_note' => ['nullable', 'string', 'max:1000'],
+            // J — Footer
+            'footer_cta_heading' => ['nullable', 'string', 'max:255'],
+            'footer_cta_subtitle' => ['nullable', 'string', 'max:1000'],
+            'footer_cta_wa_label' => ['nullable', 'string', 'max:255'],
+            'footer_cta_phone_label' => ['nullable', 'string', 'max:255'],
+            'footer_about' => ['nullable', 'string', 'max:1000'],
+            'footer_contact_heading' => ['nullable', 'string', 'max:255'],
+            'footer_hours' => ['nullable', 'string', 'max:255'],
+            'footer_map_heading' => ['nullable', 'string', 'max:255'],
+            'footer_map_cta' => ['nullable', 'string', 'max:255'],
+            'footer_copyright' => ['nullable', 'string', 'max:255'],
+            'footer_credit' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -80,6 +159,21 @@ class SettingRequest extends FormRequest
             'og_image_file.image' => 'Berkas gambar OG harus berupa gambar.',
             'og_image_file.mimes' => 'Gambar OG harus berformat jpg, jpeg, png, atau webp.',
             'og_image_file.max' => 'Ukuran gambar OG maksimal 4 MB.',
+
+            // Teks Halaman Publik — pesan untuk field panjang.
+            'hero_desc.max' => 'Deskripsi hero maksimal 1000 karakter.',
+            'hero_wa_message.max' => 'Pesan WhatsApp hero maksimal 500 karakter.',
+            'inventory_empty_desc.max' => 'Deskripsi hasil kosong maksimal 1000 karakter.',
+            'sec_inventory_subtitle_post.max' => 'Subjudul mobil maksimal 1000 karakter.',
+            'sec_credit_subtitle.max' => 'Subjudul simulasi maksimal 1000 karakter.',
+            'calc_footnote.max' => 'Catatan kalkulator maksimal 1000 karakter.',
+            'sec_quiz_subtitle.max' => 'Subjudul kuis maksimal 1000 karakter.',
+            'sec_testi_subtitle.max' => 'Subjudul testimoni maksimal 1000 karakter.',
+            'wheel_subtitle.max' => 'Subjudul roda maksimal 1000 karakter.',
+            'wheel_claim_note.max' => 'Catatan klaim maksimal 1000 karakter.',
+            'footer_cta_subtitle.max' => 'Subjudul CTA footer maksimal 1000 karakter.',
+            'footer_about.max' => 'Teks tentang maksimal 1000 karakter.',
+            'footer_credit.max' => 'Teks kredit footer maksimal 1000 karakter.',
         ];
     }
 }
