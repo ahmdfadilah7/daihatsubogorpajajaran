@@ -1,6 +1,8 @@
 @php
-    // Props: $name (string field: img or src), $label, $value (current string)
+    // Props: $name (string field: img or src), $label, $value (current string),
+    //        $fileName (optional file-input name; defaults to 'image' for BC).
     $current = old($name, $value ?? '');
+    $fileInputName = $fileName ?? 'image';
     $currentUrl = !empty($value)
         ? (\Illuminate\Support\Str::startsWith($value, ['http://', 'https://']) ? $value : asset($value))
         : null;
@@ -48,14 +50,14 @@
 
             <div>
                 <label class="mb-1 block text-xs font-medium text-slate-500">atau unggah berkas</label>
-                <input type="file" name="image" accept="image/*"
+                <input type="file" name="{{ $fileInputName }}" accept="image/*"
                        @change="const f = $event.target.files[0]; preview = f ? URL.createObjectURL(f) : null; fileName = f ? f.name : ''"
                        class="w-full cursor-pointer text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-brand-700">
                 <p class="mt-1 text-[11px] text-slate-400">
                     <span x-show="fileName" x-text="'Berkas dipilih: ' + fileName"></span>
                     <span x-show="!fileName">PNG, JPG, atau WEBP. Berkas baru akan menggantikan gambar saat ini.</span>
                 </p>
-                @error('image')
+                @error($fileInputName)
                     <p class="mt-1.5 flex items-center gap-1 text-xs text-red-600">
                         <i class="fa-solid fa-circle-exclamation"></i>{{ $message }}
                     </p>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CornerImageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\QuizQuestionController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\WheelPrizeController;
 use App\Http\Controllers\ProfileController;
@@ -34,6 +35,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('corner-images', CornerImageController::class)->except('show');
     Route::resource('hero-slides', HeroSlideController::class)->except('show');
     Route::resource('testimonials', TestimonialController::class)->except('show');
+
+    // Singleton website settings page (Pengaturan Website).
+    Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
+    Route::match(['put', 'patch'], 'settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
 require __DIR__.'/auth.php';

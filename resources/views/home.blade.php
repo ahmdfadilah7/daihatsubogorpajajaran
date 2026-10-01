@@ -3,8 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Daihatsu Sahabat - Dealer resmi Daihatsu. Temukan Ayla, Sigra, Terios, Rocky, Xenia & lainnya dengan promo, cicilan ringan, dan servis terpercaya." />
-  <title>Daihatsu Sahabat | Dealer Resmi Daihatsu</title>
+  @php
+    $settings = $settings ?? [];
+    $sName = $settings['site_name'] ?? 'Daihatsu Sahabat';
+    $sMetaTitle = $settings['meta_title'] ?? 'Daihatsu Sahabat | Dealer Resmi Daihatsu';
+    $sMetaDesc = $settings['meta_description'] ?? 'Daihatsu Sahabat - Dealer resmi Daihatsu. Temukan Ayla, Sigra, Terios, Rocky, Xenia & lainnya dengan promo, cicilan ringan, dan servis terpercaya.';
+    $sKeywords = $settings['meta_keywords'] ?? '';
+    $sAuthor = $settings['meta_author'] ?? '';
+    $sOgTitle = ($settings['og_title'] ?? '') !== '' ? $settings['og_title'] : $sMetaTitle;
+    $sOgDesc = ($settings['og_description'] ?? '') !== '' ? $settings['og_description'] : $sMetaDesc;
+    $sLogo = $settings['logo'] ?? '';
+    $sFavicon = $settings['favicon'] ?? '';
+    $sOgImage = $settings['og_image'] ?? '';
+    $assetUrl = function ($path) {
+        if ($path === null || $path === '') {
+            return null;
+        }
+        return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://']) ? $path : asset($path);
+    };
+    $sFaviconUrl = $assetUrl($sFavicon);
+    $sOgImageUrl = $assetUrl($sOgImage);
+  @endphp
+  <meta name="description" content="{{ $sMetaDesc }}" />
+  @if ($sKeywords !== '')<meta name="keywords" content="{{ $sKeywords }}" />@endif
+  @if ($sAuthor !== '')<meta name="author" content="{{ $sAuthor }}" />@endif
+  <title>{{ $sMetaTitle }}</title>
+
+  <!-- ========== Open Graph / Twitter ========== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="{{ url()->current() }}" />
+  <meta property="og:title" content="{{ $sOgTitle }}" />
+  <meta property="og:description" content="{{ $sOgDesc }}" />
+  @if ($sOgImageUrl)<meta property="og:image" content="{{ $sOgImageUrl }}" />@endif
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{ $sOgTitle }}" />
+  <meta name="twitter:description" content="{{ $sOgDesc }}" />
+  @if ($sOgImageUrl)<meta name="twitter:image" content="{{ $sOgImageUrl }}" />@endif
+  @if ($sFaviconUrl)<link rel="icon" href="{{ $sFaviconUrl }}" />@endif
 
   <!-- ========== Google Fonts: Poppins (heading) + Inter (body) ========== -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -48,10 +83,18 @@
        ===================================================================== -->
   <header id="navbar" class="fixed top-10 inset-x-0 z-50 py-4">
     <nav class="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between" aria-label="Navigasi utama">
-      <a href="#home" class="flex items-center gap-2.5 group" aria-label="Daihatsu Sahabat - Beranda">
-        <span class="w-11 h-11 rounded-2xl btn-fun flex items-center justify-center text-white text-lg font-display font-black">D</span>
+      <a href="#home" class="flex items-center gap-2.5 group" aria-label="{{ $sName }} - Beranda">
+        @if (($sLogoUrl = $assetUrl($sLogo)))
+          <img src="{{ $sLogoUrl }}" alt="{{ $sName }}" class="w-11 h-11 rounded-2xl object-cover">
+        @else
+          <span class="w-11 h-11 rounded-2xl btn-fun flex items-center justify-center text-white text-lg font-display font-black">D</span>
+        @endif
         <span class="font-display font-extrabold text-xl tracking-tight text-ink leading-none">
-          Daihatsu<span class="text-brand"> Sahabat</span>
+          @if (($settings['site_name'] ?? '') !== '')
+            {{ $sName }}
+          @else
+            Daihatsu<span class="text-brand"> Sahabat</span>
+          @endif
         </span>
       </a>
 
@@ -480,14 +523,24 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12">
         <div class="lg:col-span-4 reveal">
           <a href="#home" class="flex items-center gap-2.5">
-            <span class="w-11 h-11 rounded-2xl btn-fun flex items-center justify-center text-white text-lg font-display font-black">D</span>
-            <span class="font-display font-extrabold text-xl">Daihatsu <span class="text-brand-light">Sahabat</span></span>
+            @if (($sLogoUrl = $assetUrl($sLogo)))
+              <img src="{{ $sLogoUrl }}" alt="{{ $sName }}" class="w-11 h-11 rounded-2xl object-cover">
+            @else
+              <span class="w-11 h-11 rounded-2xl btn-fun flex items-center justify-center text-white text-lg font-display font-black">D</span>
+            @endif
+            <span class="font-display font-extrabold text-xl">
+              @if (($settings['site_name'] ?? '') !== '')
+                {{ $sName }}
+              @else
+                Daihatsu <span class="text-brand-light">Sahabat</span>
+              @endif
+            </span>
           </a>
           <p class="text-white/60 mt-5 leading-relaxed max-w-sm">Dealer resmi Daihatsu yang menemani keluarga Indonesia sejak 2011. Sahabat di setiap perjalanan.</p>
           <div class="flex gap-3 mt-6">
-            <a href="#" aria-label="Instagram" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
-            <a href="#" aria-label="Facebook" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
-            <a href="#" aria-label="YouTube" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+            <a href="{{ ($settings['social_instagram'] ?? '') !== '' ? $settings['social_instagram'] : '#' }}" aria-label="Instagram" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+            <a href="{{ ($settings['social_facebook'] ?? '') !== '' ? $settings['social_facebook'] : '#' }}" aria-label="Facebook" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+            <a href="{{ ($settings['social_youtube'] ?? '') !== '' ? $settings['social_youtube'] : '#' }}" aria-label="YouTube" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
             <a href="#" aria-label="TikTok" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
           </div>
         </div>
@@ -523,7 +576,7 @@
       </div>
 
       <div class="mt-14 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/50">
-        <p>&copy; <span id="year"></span> Daihatsu Sahabat. All rights reserved.</p>
+        <p>&copy; <span id="year"></span> {{ $sName }}. All rights reserved.</p>
         <p>Dibuat dengan <i class="fa-solid fa-heart text-brand-light" aria-hidden="true"></i><span class="sr-only">cinta</span> untuk keluarga Indonesia.</p>
       </div>
     </div>

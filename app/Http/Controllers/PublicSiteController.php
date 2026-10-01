@@ -7,6 +7,7 @@ use App\Models\CategoryStyle;
 use App\Models\CornerImage;
 use App\Models\HeroSlide;
 use App\Models\QuizQuestion;
+use App\Models\SiteSetting;
 use App\Models\Testimonial;
 use App\Models\WheelPrize;
 
@@ -110,6 +111,9 @@ class PublicSiteController extends Controller
             ->values()
             ->toArray();
 
+        // SITE SETTINGS — resolved key-value map for <head> meta + branding.
+        $settings = SiteSetting::allAsArray();
+
         return view('home', compact(
             'cars',
             'catStyle',
@@ -118,6 +122,7 @@ class PublicSiteController extends Controller
             'cornerImages',
             'heroSlides',
             'testimonials',
+            'settings',
         ));
     }
 }
