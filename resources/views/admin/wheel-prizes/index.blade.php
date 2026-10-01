@@ -5,13 +5,13 @@
 
 @section('content')
     <div class="flex justify-end mb-4">
-        <a href="{{ route('admin.wheel-prizes.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-            <i class="fa-solid fa-plus mr-1"></i> Tambah Hadiah
+        <a href="{{ route('admin.wheel-prizes.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700">
+            <i class="fa-solid fa-plus"></i> Tambah Hadiah
         </a>
     </div>
 
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table class="w-full text-sm">
+        <table id="wheel-prizes-table" @if ($prizes->count()) data-dt data-dt-nosort="4" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
                     <th class="px-4 py-3">Label</th>
@@ -32,10 +32,10 @@
                         </td>
                         <td class="px-4 py-3">{{ $prize->weight }}</td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
-                            <a href="{{ route('admin.wheel-prizes.edit', $prize) }}" class="text-blue-600 hover:underline">Edit</a>
-                            <form action="{{ route('admin.wheel-prizes.destroy', $prize) }}" method="POST" class="inline" onsubmit="return confirm('Hapus hadiah ini?')">
+                            <a href="{{ route('admin.wheel-prizes.edit', $prize) }}" class="font-medium text-brand-600 hover:underline">Edit</a>
+                            <form action="{{ route('admin.wheel-prizes.destroy', $prize) }}" method="POST" class="inline" data-confirm="Hadiah roda ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.">
                                 @csrf @method('DELETE')
-                                <button class="text-red-600 hover:underline ml-2">Hapus</button>
+                                <button class="ml-2 font-medium text-red-600 hover:underline">Hapus</button>
                             </form>
                         </td>
                     </tr>

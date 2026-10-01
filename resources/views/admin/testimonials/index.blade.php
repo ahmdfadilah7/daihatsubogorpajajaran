@@ -5,13 +5,13 @@
 
 @section('content')
     <div class="flex justify-end mb-4">
-        <a href="{{ route('admin.testimonials.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-            <i class="fa-solid fa-plus mr-1"></i> Tambah Testimoni
+        <a href="{{ route('admin.testimonials.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700">
+            <i class="fa-solid fa-plus"></i> Tambah Testimoni
         </a>
     </div>
 
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table class="w-full text-sm">
+        <table id="testimonials-table" @if ($testimonials->count()) data-dt data-dt-nosort="4" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
                     <th class="px-4 py-3">Nama</th>
@@ -29,10 +29,10 @@
                         <td class="px-4 py-3">{{ $t->car }}</td>
                         <td class="px-4 py-3">{{ str_repeat('★', $t->rating) }}{{ str_repeat('☆', 5 - $t->rating) }}</td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
-                            <a href="{{ route('admin.testimonials.edit', $t) }}" class="text-blue-600 hover:underline">Edit</a>
-                            <form action="{{ route('admin.testimonials.destroy', $t) }}" method="POST" class="inline" onsubmit="return confirm('Hapus testimoni ini?')">
+                            <a href="{{ route('admin.testimonials.edit', $t) }}" class="font-medium text-brand-600 hover:underline">Edit</a>
+                            <form action="{{ route('admin.testimonials.destroy', $t) }}" method="POST" class="inline" data-confirm="Testimoni ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.">
                                 @csrf @method('DELETE')
-                                <button class="text-red-600 hover:underline ml-2">Hapus</button>
+                                <button class="ml-2 font-medium text-red-600 hover:underline">Hapus</button>
                             </form>
                         </td>
                     </tr>

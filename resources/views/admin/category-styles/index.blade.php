@@ -5,13 +5,13 @@
 
 @section('content')
     <div class="flex justify-end mb-4">
-        <a href="{{ route('admin.category-styles.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-            <i class="fa-solid fa-plus mr-1"></i> Tambah Kategori
+        <a href="{{ route('admin.category-styles.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700">
+            <i class="fa-solid fa-plus"></i> Tambah Kategori
         </a>
     </div>
 
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table class="w-full text-sm">
+        <table id="category-styles-table" @if ($categoryStyles->count()) data-dt data-dt-nosort="3" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
                     <th class="px-4 py-3">Kategori</th>
@@ -30,10 +30,10 @@
                             <span class="align-middle">{{ $style->bg }}</span>
                         </td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
-                            <a href="{{ route('admin.category-styles.edit', $style) }}" class="text-blue-600 hover:underline">Edit</a>
-                            <form action="{{ route('admin.category-styles.destroy', $style) }}" method="POST" class="inline" onsubmit="return confirm('Hapus kategori ini?')">
+                            <a href="{{ route('admin.category-styles.edit', $style) }}" class="font-medium text-brand-600 hover:underline">Edit</a>
+                            <form action="{{ route('admin.category-styles.destroy', $style) }}" method="POST" class="inline" data-confirm="Gaya kategori ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.">
                                 @csrf @method('DELETE')
-                                <button class="text-red-600 hover:underline ml-2">Hapus</button>
+                                <button class="ml-2 font-medium text-red-600 hover:underline">Hapus</button>
                             </form>
                         </td>
                     </tr>

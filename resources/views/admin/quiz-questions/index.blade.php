@@ -5,13 +5,13 @@
 
 @section('content')
     <div class="flex justify-end mb-4">
-        <a href="{{ route('admin.quiz-questions.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-            <i class="fa-solid fa-plus mr-1"></i> Tambah Pertanyaan
+        <a href="{{ route('admin.quiz-questions.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700">
+            <i class="fa-solid fa-plus"></i> Tambah Pertanyaan
         </a>
     </div>
 
     <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
-        <table class="w-full text-sm">
+        <table id="quiz-questions-table" @if ($questions->count()) data-dt data-dt-nosort="3" @endif class="w-full text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
                     <th class="px-4 py-3">Pertanyaan</th>
@@ -27,10 +27,10 @@
                         <td class="px-4 py-3"><i class="fa-solid {{ $q->icon }}"></i> <span class="text-xs text-slate-500">{{ $q->icon }}</span></td>
                         <td class="px-4 py-3">{{ $q->options_count }}</td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
-                            <a href="{{ route('admin.quiz-questions.edit', $q) }}" class="text-blue-600 hover:underline">Edit</a>
-                            <form action="{{ route('admin.quiz-questions.destroy', $q) }}" method="POST" class="inline" onsubmit="return confirm('Hapus pertanyaan ini beserta pilihannya?')">
+                            <a href="{{ route('admin.quiz-questions.edit', $q) }}" class="font-medium text-brand-600 hover:underline">Edit</a>
+                            <form action="{{ route('admin.quiz-questions.destroy', $q) }}" method="POST" class="inline" data-confirm="Pertanyaan ini beserta seluruh pilihannya akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.">
                                 @csrf @method('DELETE')
-                                <button class="text-red-600 hover:underline ml-2">Hapus</button>
+                                <button class="ml-2 font-medium text-red-600 hover:underline">Hapus</button>
                             </form>
                         </td>
                     </tr>
