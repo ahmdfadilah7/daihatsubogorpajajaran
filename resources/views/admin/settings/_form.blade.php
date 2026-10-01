@@ -102,6 +102,44 @@
             @error('social_youtube')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
+
+    {{-- ============================ Fitur Situs ============================ --}}
+    @php
+        // Flags default to ENABLED when the key is missing or empty so the
+        // site looks unchanged until the admin turns a feature off.
+        $flagOn = function ($key) use ($settings) {
+            $raw = old($key, $settings[$key] ?? '1');
+            return in_array(strtolower(trim((string) $raw)), ['1', 'true', 'on', 'yes'], true);
+        };
+        $features = [
+            ['key' => 'feature_quiz', 'label' => 'Kuis', 'help' => "Bagian 'Cari Mobil Idealmu' di halaman utama.", 'icon' => 'fa-wand-magic-sparkles'],
+            ['key' => 'feature_corner', 'label' => 'Gambar Pojok', 'help' => 'Widget gambar melayang di pojok kanan.', 'icon' => 'fa-image'],
+            ['key' => 'feature_wheel', 'label' => 'Hadiah Roda', 'help' => 'Tombol & modal roda keberuntungan.', 'icon' => 'fa-trophy'],
+        ];
+    @endphp
+    <x-admin.form-section title="Fitur Situs" subtitle="Aktifkan atau nonaktifkan fitur interaktif di situs." icon="fa-toggle-on">
+        @foreach ($features as $feature)
+            <div class="md:col-span-2">
+                <label for="{{ $feature['key'] }}" class="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 cursor-pointer transition hover:border-brand-300 hover:bg-slate-50">
+                    <span class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                        <i class="fa-solid {{ $feature['icon'] }}" aria-hidden="true"></i>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-sm font-semibold text-slate-700">{{ $feature['label'] }}</span>
+                        <span class="mt-0.5 block text-xs text-slate-400">{{ $feature['help'] }}</span>
+                    </span>
+                    {{-- Hidden '0' guarantees an unchecked box still posts a value. --}}
+                    <input type="hidden" name="{{ $feature['key'] }}" value="0">
+                    <span class="relative mt-1 inline-flex shrink-0">
+                        <input type="checkbox" id="{{ $feature['key'] }}" name="{{ $feature['key'] }}" value="1" @checked($flagOn($feature['key'])) class="peer sr-only">
+                        <span class="h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-brand-600 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-400 peer-focus-visible:ring-offset-2"></span>
+                        <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></span>
+                    </span>
+                </label>
+                @error($feature['key'])<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+            </div>
+        @endforeach
+    </x-admin.form-section>
 </div>
 
 @include('admin.partials.form-actions', ['cancel' => route('admin.settings.edit'), 'label' => 'Simpan Pengaturan'])

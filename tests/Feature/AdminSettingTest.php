@@ -102,4 +102,32 @@ class AdminSettingTest extends TestCase
             ])
             ->assertSessionHasErrors('meta_description');
     }
+
+    public function test_admin_can_disable_a_feature_toggle(): void
+    {
+        $user = User::factory()->create();
+
+        // Mirrors the form: an unchecked checkbox posts only the hidden '0'.
+        $this->actingAs($user)
+            ->put(route('admin.settings.update'), [
+                'site_name' => 'Dealer Baru',
+                'feature_quiz' => '0',
+                'feature_corner' => '1',
+                'feature_wheel' => '1',
+            ])
+            ->assertRedirect(route('admin.settings.edit'));
+
+        SiteSetting::flushCache();
+
+        $this->assertSame('0', SiteSetting::get('feature_quiz'));
+        $this->assertFalse(SiteSetting::enabled('feature_quiz'));
+        $this->assertTrue(SiteSetting::enabled('feature_corner'));
+        $this->assertTrue(SiteSetting::enabled('feature_wheel'));
+    }
+
+    public function test_feature_flag_defaults_to_enabled_when_missing(): void
+    {
+        // No row for feature_quiz yet; the convenience accessor defaults ON.
+        $this->assertTrue(SiteSetting::enabled('feature_quiz'));
+    }
 }

@@ -37,6 +37,19 @@ class SiteSettingSeeder extends Seeder
             SiteSetting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
+        // Feature toggles for interactive public-site widgets. Default ENABLED
+        // ('1') so the site looks identical to today. Use firstOrCreate so
+        // re-seeding never clobbers a value the admin has already changed.
+        $featureFlags = [
+            'feature_quiz' => '1',
+            'feature_corner' => '1',
+            'feature_wheel' => '1',
+        ];
+
+        foreach ($featureFlags as $key => $value) {
+            SiteSetting::firstOrCreate(['key' => $key], ['value' => $value]);
+        }
+
         SiteSetting::flushCache();
     }
 }

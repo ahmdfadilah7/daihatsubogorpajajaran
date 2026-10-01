@@ -39,6 +39,22 @@ class SiteSetting extends Model
     }
 
     /**
+     * Read a boolean/flag setting. Interprets '1'/'true'/'on'/'yes' as true
+     * and '0'/'false'/'off'/'no'/'' as false. Missing keys fall back to
+     * $default so new flags behave as enabled until explicitly turned off.
+     */
+    public static function enabled(string $key, bool $default = true): bool
+    {
+        $value = static::allAsArray()[$key] ?? null;
+
+        if ($value === null) {
+            return $default;
+        }
+
+        return in_array(strtolower(trim((string) $value)), ['1', 'true', 'on', 'yes'], true);
+    }
+
+    /**
      * Forget the cached settings so edits take effect immediately.
      */
     public static function flushCache(): void

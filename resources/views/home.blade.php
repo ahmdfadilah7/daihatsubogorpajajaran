@@ -23,6 +23,18 @@
     };
     $sFaviconUrl = $assetUrl($sFavicon);
     $sOgImageUrl = $assetUrl($sOgImage);
+    // Feature toggles — default ENABLED when the key is missing/empty so the
+    // site is unchanged until the admin turns a feature off in Pengaturan.
+    $flagOn = function ($key) use ($settings) {
+        $raw = $settings[$key] ?? '1';
+        if ($raw === null || $raw === '') {
+            return true;
+        }
+        return in_array(strtolower(trim((string) $raw)), ['1', 'true', 'on', 'yes'], true);
+    };
+    $quizEnabled = $flagOn('feature_quiz');
+    $cornerEnabled = $flagOn('feature_corner');
+    $wheelEnabled = $flagOn('feature_wheel');
   @endphp
   <meta name="description" content="{{ $sMetaDesc }}" />
   @if ($sKeywords !== '')<meta name="keywords" content="{{ $sKeywords }}" />@endif
@@ -102,7 +114,7 @@
         <li><a href="#home" class="nav-link hover:text-ink transition-colors">Home</a></li>
         <li><a href="#inventory" class="nav-link hover:text-ink transition-colors">Mobil</a></li>
         <li><a href="#services" class="nav-link hover:text-ink transition-colors">Layanan</a></li>
-        <li><a href="#kuis" class="nav-link hover:text-ink transition-colors">Kuis</a></li>
+        @if ($quizEnabled)<li><a href="#kuis" class="nav-link hover:text-ink transition-colors">Kuis</a></li>@endif
         <li><a href="#testimoni" class="nav-link hover:text-ink transition-colors">Testimoni</a></li>
         <li><a href="#contact" class="nav-link hover:text-ink transition-colors">Kontak</a></li>
       </ul>
@@ -123,7 +135,7 @@
         <li><a href="#home" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Home</a></li>
         <li><a href="#inventory" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Mobil</a></li>
         <li><a href="#services" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Layanan</a></li>
-        <li><a href="#kuis" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Kuis</a></li>
+        @if ($quizEnabled)<li><a href="#kuis" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Kuis</a></li>@endif
         <li><a href="#testimoni" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Testimoni</a></li>
         <li><a href="#contact" class="block px-4 py-3 rounded-xl hover:bg-cream hover:text-brand">Kontak</a></li>
         <li class="pt-3 mt-2 border-t border-ink/10">
@@ -428,6 +440,7 @@
          5b. KUIS: MOBIL APA YANG COCOK UNTUKMU?
          Dirender & dikontrol oleh js/quiz.js
          ===================================================================== -->
+    @if ($quizEnabled)
     <section id="kuis" class="relative py-20 md:py-28 scroll-mt-20 overflow-hidden">
       <div class="blob w-80 h-80 bg-mango -left-24 top-10 float"></div>
       <div class="blob w-72 h-72 bg-sky2 -right-24 bottom-10 float-2"></div>
@@ -456,6 +469,7 @@
         </div>
       </div>
     </section>
+    @endif
 
     <!-- =====================================================================
          6. TESTIMONI & GALERI PELANGGAN
@@ -636,6 +650,7 @@
        Dibuka lewat tombol #spinTrigger atau easter egg keyboard (ketik "hoki").
        Dikontrol oleh js/spin-wheel.js
        ===================================================================== -->
+  @if ($wheelEnabled)
   <button type="button" id="spinTrigger" class="spin-trigger" aria-label="Main roda keberuntungan">
     <i class="fa-solid fa-gift" aria-hidden="true"></i>
     <span class="spin-trigger-label">Menangkan Hadiah!</span>
@@ -672,11 +687,14 @@
       </div>
     </div>
   </div>
+  @endif
 
   <!-- Widget gambar melayang di pojok kanan (diisi & diputar oleh js/corner-widget.js) -->
+  @if ($cornerEnabled)
   <div id="cornerWidget" aria-label="Info Daihatsu" aria-live="polite">
     <div id="cornerDots" aria-hidden="true"></div>
   </div>
+  @endif
 
   <a href="#home" id="toTop" aria-label="Kembali ke atas"
      class="fixed bottom-6 left-6 z-40 w-12 h-12 rounded-full btn-fun text-white flex items-center justify-center opacity-0 pointer-events-none translate-y-4 transition-all duration-500">

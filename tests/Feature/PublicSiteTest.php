@@ -36,4 +36,28 @@ class PublicSiteTest extends TestCase
         $this->assertStringContainsString('App.QUIZ = [', $body);
         $this->assertSame(4, substr_count($body, '"q":'));
     }
+
+    /**
+     * The feature_quiz toggle drives whether the quiz section and its nav
+     * links are rendered on the public page, while the rest of the page
+     * (car bootstrap) stays intact.
+     */
+    public function test_feature_toggle_controls_quiz_section_markup(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        // Enabled (seed default): quiz section + nav link present.
+        $enabled = $this->get('/')->getContent();
+        $this->assertStringContainsString('id="kuis"', $enabled);
+        $this->assertStringContainsString('href="#kuis"', $enabled);
+
+        // Disabled: section and both nav links gone, cars still bootstrapped.
+        \App\Models\SiteSetting::updateOrCreate(['key' => 'feature_quiz'], ['value' => '0']);
+        \App\Models\SiteSetting::flushCache();
+
+        $disabled = $this->get('/')->getContent();
+        $this->assertStringNotContainsString('id="kuis"', $disabled);
+        $this->assertStringNotContainsString('href="#kuis"', $disabled);
+        $this->assertStringContainsString('App.CARS = [', $disabled);
+    }
 }

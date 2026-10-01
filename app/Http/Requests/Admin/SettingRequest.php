@@ -47,6 +47,11 @@ class SettingRequest extends FormRequest
             'social_facebook' => ['nullable', 'string', 'max:255'],
             'social_instagram' => ['nullable', 'string', 'max:255'],
             'social_youtube' => ['nullable', 'string', 'max:255'],
+
+            // Fitur Situs (toggle on/off)
+            'feature_quiz' => ['nullable', 'in:0,1'],
+            'feature_corner' => ['nullable', 'in:0,1'],
+            'feature_wheel' => ['nullable', 'in:0,1'],
         ];
     }
 
@@ -61,6 +66,10 @@ class SettingRequest extends FormRequest
             'meta_description.max' => 'Deskripsi meta maksimal 300 karakter.',
             'meta_keywords.max' => 'Kata kunci meta maksimal 255 karakter.',
             'contact_email.email' => 'Alamat email tidak valid.',
+
+            'feature_quiz.in' => 'Nilai fitur Kuis tidak valid.',
+            'feature_corner.in' => 'Nilai fitur Gambar Pojok tidak valid.',
+            'feature_wheel.in' => 'Nilai fitur Hadiah Roda tidak valid.',
 
             'logo_file.image' => 'Berkas logo harus berupa gambar.',
             'logo_file.mimes' => 'Logo harus berformat jpg, jpeg, png, atau webp.',
