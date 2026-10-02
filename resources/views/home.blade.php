@@ -393,23 +393,32 @@
           $cFirstPrice = (int) ($cars[0]['price'] ?? 0);
         @endphp
         <!-- Kalkulator cicilan interaktif (satu card) -->
-        <div class="reveal bg-white rounded-3xl shadow-xl p-8 md:p-10 max-w-3xl mx-auto">
+        <div class="reveal bg-white rounded-3xl shadow-xl p-5 sm:p-8 md:p-10 max-w-3xl mx-auto">
           <!-- Slider input -->
           <div class="space-y-6">
             <div>
-              <div class="flex justify-between text-sm font-semibold text-ink mb-2">
-                <label for="calcCar">{{ $t('calc_label_price', 'Harga Mobil') }}</label>
-                <span id="calcPriceLabel" class="text-brand">{{ $cars ? 'Rp '.number_format($cFirstPrice, 0, ',', '.') : 'Rp 0' }}</span>
+              <div class="flex justify-between items-center text-sm font-semibold text-ink mb-2 gap-3">
+                <label for="calcCar" class="inline-flex items-center gap-1.5 shrink-0">
+                  <i class="fa-solid fa-car text-brand" aria-hidden="true"></i> {{ $t('calc_label_price', 'Harga Mobil') }}
+                </label>
+                <span id="calcPriceLabel" class="font-display font-extrabold text-brand text-right tabular-nums break-all">{{ $cars ? 'Rp '.number_format($cFirstPrice, 0, ',', '.') : 'Rp 0' }}</span>
               </div>
-              <select id="calcCar" class="w-full rounded-xl border-ink/15 text-sm font-semibold text-ink focus:border-brand focus:ring-brand cursor-pointer">
-                @forelse ($cars as $car)
-                  <option value="{{ $car['id'] }}" data-price="{{ (int) $car['price'] }}" @selected($loop->first)>
-                    {{ $car['model'] }}{{ $car['type'] ? ' '.$car['type'] : '' }} — Rp {{ number_format((int) $car['price'], 0, ',', '.') }}
-                  </option>
-                @empty
-                  <option value="" data-price="0">Belum ada mobil</option>
-                @endforelse
-              </select>
+              <!-- Select mobil dengan ikon + chevron kustom (.field-select), lega & jelas di mobile -->
+              <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-brand">
+                  <i class="fa-solid fa-car-side" aria-hidden="true"></i>
+                </span>
+                <select id="calcCar" aria-label="Pilih mobil untuk simulasi"
+                        class="field-select w-full rounded-xl border-2 border-ink/10 bg-cream pl-11 pr-10 py-3.5 text-sm sm:text-base font-semibold text-ink cursor-pointer">
+                  @forelse ($cars as $car)
+                    <option value="{{ $car['id'] }}" data-price="{{ (int) $car['price'] }}" @selected($loop->first)>
+                      {{ $car['model'] }}{{ $car['type'] ? ' '.$car['type'] : '' }} — Rp {{ number_format((int) $car['price'], 0, ',', '.') }}
+                    </option>
+                  @empty
+                    <option value="" data-price="0">Belum ada mobil</option>
+                  @endforelse
+                </select>
+              </div>
             </div>
             <div>
               <div class="flex justify-between text-sm font-semibold text-ink mb-2">
@@ -433,14 +442,14 @@
           <div class="mt-8 pt-8 border-t border-ink/10 text-center">
             <p class="text-ink-500 font-semibold text-sm">{{ $t('calc_label_result', 'Perkiraan Angsuran / Bulan') }}</p>
             <p id="calcResult" class="font-display font-black text-4xl sm:text-5xl text-brand mt-2">Rp 0</p>
-            <div class="mt-6 grid grid-cols-2 gap-4 text-sm max-w-md mx-auto">
-              <div class="bg-cream rounded-2xl p-4">
-                <p class="text-ink-500">{{ $t('calc_label_total_dp', 'Total DP') }}</p>
-                <p id="calcDpAmount" class="font-display font-bold text-lg text-ink mt-1">Rp 0</p>
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm max-w-md mx-auto">
+              <div class="bg-cream rounded-2xl p-3 sm:p-4 min-w-0">
+                <p class="text-ink-500 text-xs sm:text-sm">{{ $t('calc_label_total_dp', 'Total DP') }}</p>
+                <p id="calcDpAmount" class="font-display font-bold text-base sm:text-lg text-ink mt-1 tabular-nums break-all leading-tight">Rp 0</p>
               </div>
-              <div class="bg-cream rounded-2xl p-4">
-                <p class="text-ink-500">{{ $t('calc_label_total_loan', 'Total Pinjaman') }}</p>
-                <p id="calcLoan" class="font-display font-bold text-lg text-ink mt-1">Rp 0</p>
+              <div class="bg-cream rounded-2xl p-3 sm:p-4 min-w-0">
+                <p class="text-ink-500 text-xs sm:text-sm">{{ $t('calc_label_total_loan', 'Total Pinjaman') }}</p>
+                <p id="calcLoan" class="font-display font-bold text-base sm:text-lg text-ink mt-1 tabular-nums break-all leading-tight">Rp 0</p>
               </div>
             </div>
             <a href="#contact" class="mt-7 inline-flex items-center gap-2 btn-fun text-white font-display font-bold px-6 py-3 rounded-full">
