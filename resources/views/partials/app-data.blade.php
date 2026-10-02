@@ -27,4 +27,7 @@ App.CREDIT = {
     maxTenor: {!! json_encode($creditNum('credit_max_tenor', 6)) !!},
     defaultTenor: {!! json_encode($creditNum('credit_default_tenor', 4)) !!},
 };
+// Hero countdown target. Empty string => main.js falls back to end-of-month.
+// Raw stored string; JS parses it (local time), consistent with today's logic.
+App.PROMO_DEADLINE = @json($settings['promo_deadline'] ?? '');
 </script>

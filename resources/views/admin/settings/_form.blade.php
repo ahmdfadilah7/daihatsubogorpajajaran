@@ -244,6 +244,13 @@
             <p class="mt-1 text-xs text-slate-400">Label tombol kontak di navbar (desktop &amp; mobile).</p>
             @error('nav_cta')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tanggal Berakhir Promo</label>
+            {{-- datetime-local expects 'YYYY-MM-DDTHH:MM'; strip any stored seconds so the input prefills cleanly. --}}
+            <input type="datetime-local" name="promo_deadline" value="{{ substr($val('promo_deadline'), 0, 16) }}" class="{{ $inputClass }} @error('promo_deadline') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Hitung mundur promo di hero akan menuju tanggal &amp; jam ini. Kosongkan untuk memakai akhir bulan berjalan.</p>
+            @error('promo_deadline')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
     </x-admin.form-section>
     </div>
 

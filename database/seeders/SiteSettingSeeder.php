@@ -80,6 +80,9 @@ class SiteSettingSeeder extends Seeder
             'promo_text' => 'DP mulai 15 Juta',
             'promo_text_extra' => '+ gratis servis 1 tahun.',
             'promo_cta' => 'Lihat mobil →',           // glyph, NOT &rarr;
+            // Hero countdown target. '' => main.js falls back to the end of the
+            // current month (today's behavior), so nothing changes until set.
+            'promo_deadline' => '',
             // B — Navbar (1)
             'nav_cta' => 'Hubungi Kami',
             // C — Hero (14)

@@ -22,8 +22,15 @@ window.App = window.App || {};
   const cd = $('#heroCountdown');
   if (cd) {
     const now = new Date();
-    // Akhir bulan ini, pukul 23:59:59
-    const deadline = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    // Target hitung mundur dari pengaturan admin (App.PROMO_DEADLINE,
+    // 'YYYY-MM-DDTHH:MM' => diurai sebagai waktu LOKAL browser, sesuai niat
+    // admin). Bila kosong / tidak valid, pakai akhir bulan berjalan 23:59:59
+    // seperti perilaku sebelumnya. isNaN menjaga nilai rusak tak merusak timer.
+    const raw = (window.App && window.App.PROMO_DEADLINE) ? window.App.PROMO_DEADLINE : '';
+    let deadline = raw ? new Date(raw) : null;
+    if (!deadline || isNaN(deadline.getTime())) {
+      deadline = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    }
     const pad = (n) => String(n).padStart(2, '0');
 
     function tick() {

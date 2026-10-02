@@ -65,6 +65,9 @@ class SettingRequest extends FormRequest
             'promo_text' => ['nullable', 'string', 'max:255'],
             'promo_text_extra' => ['nullable', 'string', 'max:255'],
             'promo_cta' => ['nullable', 'string', 'max:255'],
+            // Hero countdown target (datetime-local 'YYYY-MM-DDTHH:MM'). Empty
+            // => fallback to end-of-current-month in main.js.
+            'promo_deadline' => ['nullable', 'date'],
             // B — Navbar
             'nav_cta' => ['nullable', 'string', 'max:255'],
             // C — Hero
@@ -164,6 +167,7 @@ class SettingRequest extends FormRequest
             'contact_email.email' => 'Alamat email tidak valid.',
             'social_tiktok.max' => 'Tautan TikTok maksimal 255 karakter.',
             'maps_url.max' => 'Tautan Google Maps maksimal 1000 karakter.',
+            'promo_deadline.date' => 'Tanggal berakhir promo tidak valid.',
 
             'feature_quiz.in' => 'Nilai fitur Kuis tidak valid.',
             'feature_corner.in' => 'Nilai fitur Gambar Pojok tidak valid.',
