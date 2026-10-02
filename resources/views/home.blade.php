@@ -442,15 +442,15 @@
           <div class="mt-8 pt-8 border-t border-ink/10 text-center">
             <p class="text-ink-500 font-semibold text-sm">{{ $t('calc_label_result', 'Perkiraan Angsuran / Bulan') }}</p>
             <p id="calcResult" class="font-display font-black text-4xl sm:text-5xl text-brand mt-2">Rp 0</p>
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm max-w-md mx-auto">
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-1 gap-3 sm:gap-4 text-sm max-w-md mx-auto">
               <div class="bg-cream rounded-2xl p-3 sm:p-4 min-w-0">
                 <p class="text-ink-500 text-xs sm:text-sm">{{ $t('calc_label_total_dp', 'Total DP') }}</p>
                 <p id="calcDpAmount" class="font-display font-bold text-base sm:text-lg text-ink mt-1 tabular-nums break-all leading-tight">Rp 0</p>
               </div>
-              <div class="bg-cream rounded-2xl p-3 sm:p-4 min-w-0">
+              <!-- <div class="bg-cream rounded-2xl p-3 sm:p-4 min-w-0">
                 <p class="text-ink-500 text-xs sm:text-sm">{{ $t('calc_label_total_loan', 'Total Pinjaman') }}</p>
                 <p id="calcLoan" class="font-display font-bold text-base sm:text-lg text-ink mt-1 tabular-nums break-all leading-tight">Rp 0</p>
-              </div>
+              </div> -->
             </div>
             <a href="#contact" class="mt-7 inline-flex items-center gap-2 btn-fun text-white font-display font-bold px-6 py-3 rounded-full">
               {{ $t('calc_btn', 'Ajukan Kredit') }} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
