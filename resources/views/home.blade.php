@@ -553,7 +553,7 @@
           <a href="https://wa.me/{{ $waNumber }}" class="btn-fun text-white font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">
             <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i> {{ $t('footer_cta_wa_label', 'Chat WhatsApp') }}
           </a>
-          <a href="tel:+622100000000" class="btn-soft text-ink font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">
+          <a href="tel:{{ $phoneNumber }}" class="btn-soft text-ink font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">
             <i class="fa-solid fa-phone" aria-hidden="true"></i> {{ $t('footer_cta_phone_label', 'Telepon') }}
           </a>
         </div>
@@ -588,7 +588,7 @@
           <h3 class="font-display font-bold uppercase tracking-wider text-sm">{{ $t('footer_contact_heading', 'Hubungi Kami') }}</h3>
           <ul class="mt-6 space-y-4 text-white/60">
             <li class="flex gap-3"><i class="fa-solid fa-location-dot text-brand-light mt-1" aria-hidden="true"></i><span>{{ $t('contact_address', 'Jl. Raya Sahabat No. 88, Jakarta') }}</span></li>
-            <li class="flex gap-3"><i class="fa-solid fa-phone text-brand-light mt-1" aria-hidden="true"></i><a href="tel:+622100000000" class="hover:text-white">+62 21 0000 0000</a></li>
+            <li class="flex gap-3"><i class="fa-solid fa-phone text-brand-light mt-1" aria-hidden="true"></i><a href="tel:{{ $phoneNumber }}" class="hover:text-white">{{ $phoneNumber }}</a></li>
             <li class="flex gap-3"><i class="fa-solid fa-envelope text-brand-light mt-1" aria-hidden="true"></i><a href="mailto:{{ $t('contact_email', 'halo@example.com') }}" class="hover:text-white">{{ $t('contact_email', 'halo@example.com') }}</a></li>
             <li class="flex gap-3"><i class="fa-regular fa-clock text-brand-light mt-1" aria-hidden="true"></i><span>{{ $t('footer_hours', 'Sen – Sab, 08.00 – 20.00 WIB') }}</span></li>
           </ul>

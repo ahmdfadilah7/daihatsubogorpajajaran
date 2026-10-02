@@ -49,6 +49,10 @@ class SiteSettingSeeder extends Seeder
         $footerLinks = [
             'social_tiktok' => '',
             'maps_url' => 'https://www.google.com/maps?q=Jl.+Jenderal+Sudirman,+Jakarta',
+            // Dedicated footer phone number for the "Telepon" tel: button.
+            // Default '' => the footer phone falls back to the WhatsApp number
+            // (see SiteSetting::phoneNumber()), so the link always works.
+            'contact_phone' => '',
         ];
 
         foreach ($footerLinks as $key => $value) {

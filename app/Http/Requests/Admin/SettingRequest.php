@@ -42,6 +42,7 @@ class SettingRequest extends FormRequest
 
             // Kontak & Lainnya
             'contact_whatsapp' => ['nullable', 'string', 'max:30'],
+            'contact_phone' => ['nullable', 'string', 'max:30'],
             'contact_email' => ['nullable', 'email', 'max:120'],
             'contact_address' => ['nullable', 'string', 'max:255'],
             'social_facebook' => ['nullable', 'string', 'max:255'],
@@ -159,6 +160,7 @@ class SettingRequest extends FormRequest
             'meta_title.max' => 'Judul meta maksimal 160 karakter.',
             'meta_description.max' => 'Deskripsi meta maksimal 300 karakter.',
             'meta_keywords.max' => 'Kata kunci meta maksimal 255 karakter.',
+            'contact_phone.max' => 'Nomor telepon maksimal 30 karakter.',
             'contact_email.email' => 'Alamat email tidak valid.',
             'social_tiktok.max' => 'Tautan TikTok maksimal 255 karakter.',
             'maps_url.max' => 'Tautan Google Maps maksimal 1000 karakter.',

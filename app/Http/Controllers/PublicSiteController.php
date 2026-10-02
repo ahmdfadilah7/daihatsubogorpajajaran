@@ -128,6 +128,11 @@ class PublicSiteController extends Controller
         // JS modules as window.App.WA so every WA link uses the admin number.
         $waNumber = SiteSetting::whatsappNumber();
 
+        // PHONE — tel:-ready international number ('+62...') for the footer
+        // "Telepon" button. Falls back contact_phone -> contact_whatsapp ->
+        // default, mirroring the WhatsApp normalization so both stay consistent.
+        $phoneNumber = SiteSetting::phoneNumber();
+
         return view('home', compact(
             'cars',
             'catStyle',
@@ -139,6 +144,7 @@ class PublicSiteController extends Controller
             'marqueeItems',
             'settings',
             'waNumber',
+            'phoneNumber',
         ));
     }
 }

@@ -127,6 +127,12 @@
             @error('contact_whatsapp')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
         <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Telepon</label>
+            <input type="text" name="contact_phone" value="{{ $val('contact_phone') }}" placeholder="+62 21 5000 1234" class="{{ $inputClass }} @error('contact_phone') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Nomor telepon untuk tombol Telepon di footer. Kosongkan untuk memakai nomor WhatsApp.</p>
+            @error('contact_phone')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Email</label>
             <input type="text" name="contact_email" value="{{ $val('contact_email') }}" placeholder="halo@example.com" class="{{ $inputClass }} @error('contact_email') {{ $errClass }} @enderror">
             @error('contact_email')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror

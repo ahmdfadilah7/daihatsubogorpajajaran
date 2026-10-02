@@ -80,6 +80,35 @@ class SiteSetting extends Model
     }
 
     /**
+     * Resolve the admin-configured phone number into a clean, tel:-ready
+     * international string prefixed with '+'. Mirrors whatsappNumber()'s
+     * normalization (strip non-digits; leading '0' -> '62') and applies the
+     * fallback chain the user asked for:
+     *   contact_phone (if non-empty) -> contact_whatsapp -> historical default.
+     * The returned value is suitable for a `tel:` href (e.g. '+622150001234').
+     */
+    public static function phoneNumber(string $default = '+6281234567890'): string
+    {
+        // Source value: dedicated phone first, else the WhatsApp number.
+        $raw = static::get('contact_phone', '');
+        if (preg_replace('/\D+/', '', (string) $raw) === '') {
+            $raw = static::get('contact_whatsapp', '');
+        }
+
+        $digits = preg_replace('/\D+/', '', (string) $raw);
+
+        if ($digits === '' || $digits === null) {
+            return $default;
+        }
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . substr($digits, 1);
+        }
+
+        return '+' . $digits;
+    }
+
+    /**
      * Forget the cached settings so edits take effect immediately.
      */
     public static function flushCache(): void
