@@ -9,6 +9,7 @@
 @endphp
 <script>
 window.App = window.App || {};
+App.WA = @json($waNumber);
 App.CARS = @json($cars);
 App.CAT_STYLE = @json($catStyle);
 App.QUIZ = @json($quiz);

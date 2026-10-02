@@ -65,4 +65,49 @@ class EditablePublicTextTest extends TestCase
                 false
             );
     }
+
+    /**
+     * With a human-formatted contact_whatsapp, the public page normalizes it to
+     * digits-only international form (0->62) and uses it for the hero WA href
+     * and the window.App.WA bootstrap value the JS modules read.
+     */
+    public function test_public_page_uses_normalized_contact_whatsapp(): void
+    {
+        SiteSetting::updateOrCreate(['key' => 'contact_whatsapp'], ['value' => '+62 877 1111 2222']);
+        SiteSetting::flushCache();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('App.WA = "6287711112222";', false)
+            ->assertSee('https://wa.me/6287711112222?text=', false)
+            ->assertDontSee('App.WA = "6281234567890";', false);
+    }
+
+    /**
+     * A local Indonesian number (leading 0) is normalized to the 62 prefix.
+     */
+    public function test_local_contact_whatsapp_is_normalized_to_international(): void
+    {
+        SiteSetting::updateOrCreate(['key' => 'contact_whatsapp'], ['value' => '08123456789']);
+        SiteSetting::flushCache();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('App.WA = "628123456789";', false);
+    }
+
+    /**
+     * An empty/blank contact_whatsapp falls back to the hardcoded default so WA
+     * buttons never break, for both the hero href and window.App.WA.
+     */
+    public function test_empty_contact_whatsapp_falls_back_to_default_number(): void
+    {
+        SiteSetting::updateOrCreate(['key' => 'contact_whatsapp'], ['value' => '']);
+        SiteSetting::flushCache();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('App.WA = "6281234567890";', false)
+            ->assertSee('https://wa.me/6281234567890', false);
+    }
 }

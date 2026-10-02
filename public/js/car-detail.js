@@ -9,6 +9,9 @@ window.App = window.App || {};
   const CARS = App.CARS;
   const CAT_STYLE = App.CAT_STYLE;
 
+  // Nomor WhatsApp dari pengaturan admin (window.App.WA), fallback default.
+  const WA_NUMBER = (window.App && window.App.WA) ? window.App.WA : '6281234567890';
+
   const overlay = $('#detailOverlay');
   const panel   = $('#detailPanel');
   const body    = $('#detailBody');
@@ -95,7 +98,7 @@ window.App = window.App || {};
 
         <!-- Tombol aksi -->
         <div class="d-anim d4 flex flex-col gap-3 mt-8">
-          <a href="https://wa.me/6281234567890?text=${waText}" target="_blank" rel="noopener"
+          <a href="https://wa.me/${WA_NUMBER}?text=${waText}" target="_blank" rel="noopener"
              class="btn-fun text-white font-display font-bold py-3.5 rounded-full text-center inline-flex items-center justify-center gap-2">
             <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i> Pesan Test Drive
           </a>

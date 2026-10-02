@@ -123,6 +123,11 @@ class PublicSiteController extends Controller
         // SITE SETTINGS — resolved key-value map for <head> meta + branding.
         $settings = SiteSetting::allAsArray();
 
+        // WHATSAPP — normalized digits-only international number (0->62) with a
+        // safe fallback. Used by the Blade WA buttons and exposed to the public
+        // JS modules as window.App.WA so every WA link uses the admin number.
+        $waNumber = SiteSetting::whatsappNumber();
+
         return view('home', compact(
             'cars',
             'catStyle',
@@ -133,6 +138,7 @@ class PublicSiteController extends Controller
             'testimonials',
             'marqueeItems',
             'settings',
+            'waNumber',
         ));
     }
 }

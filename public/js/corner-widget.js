@@ -11,8 +11,9 @@ window.App = window.App || {};
   const widget = $('#cornerWidget');
   if (!widget || IMAGES.length === 0) return;
 
-  // Nomor & pesan WhatsApp tujuan saat widget diklik (ubah sesuai kebutuhan)
-  const WA_NUMBER = '6281234567890';
+  // Nomor & pesan WhatsApp tujuan saat widget diklik. Nomor diambil dari
+  // pengaturan admin (window.App.WA), dengan fallback nomor default.
+  const WA_NUMBER = (window.App && window.App.WA) ? window.App.WA : '6281234567890';
   const WA_TEXT = 'Halo, saya mau tanya soal mobil Daihatsu';
   const WA_URL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_TEXT)}`;
 

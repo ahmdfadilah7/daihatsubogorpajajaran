@@ -10,6 +10,9 @@ window.App = window.App || {};
   const CARS = App.CARS;
   const CAT_STYLE = App.CAT_STYLE;
 
+  // Nomor WhatsApp dari pengaturan admin (window.App.WA), fallback default.
+  const WA_NUMBER = (window.App && window.App.WA) ? window.App.WA : '6281234567890';
+
   const MAX = 3;
   const selected = []; // berisi id mobil terpilih
 
@@ -143,7 +146,7 @@ window.App = window.App || {};
         <td class="row-label"></td>
         ${cars.map((c) => `
           <td>
-            <a href="https://wa.me/6281234567890?text=${encodeURIComponent('Halo, saya tertarik Daihatsu ' + c.model)}" target="_blank" rel="noopener"
+            <a href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo, saya tertarik Daihatsu ' + c.model)}" target="_blank" rel="noopener"
                class="btn-fun text-white text-xs font-bold px-4 py-2 rounded-full inline-flex items-center gap-1.5">
               <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Tanya
             </a>

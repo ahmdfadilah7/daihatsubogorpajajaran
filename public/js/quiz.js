@@ -18,7 +18,7 @@ window.App = window.App || {};
   const progressWrap = $('#quizProgressWrap');
   if (!stage || QUIZ.length === 0) return;
 
-  const WA_NUMBER = '6281234567890';
+  const WA_NUMBER = (window.App && window.App.WA) ? window.App.WA : '6281234567890';
   let step = 0;
   const scores = {}; // { model: totalPoin }
 

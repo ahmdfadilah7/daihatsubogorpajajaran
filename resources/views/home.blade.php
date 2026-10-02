@@ -194,7 +194,7 @@
             <a href="#inventory" class="btn-fun text-white font-display font-bold px-8 py-4 rounded-full inline-flex items-center justify-center gap-3">
               {{ $t('hero_btn_primary', 'Lihat Semua Mobil') }} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </a>
-            <a href="https://wa.me/6281234567890?text={{ rawurlencode($t('hero_wa_message', 'Halo, saya mau test drive mobil Daihatsu')) }}"
+            <a href="https://wa.me/{{ $waNumber }}?text={{ rawurlencode($t('hero_wa_message', 'Halo, saya mau test drive mobil Daihatsu')) }}"
                target="_blank" rel="noopener"
                class="btn-soft text-ink font-display font-bold px-8 py-4 rounded-full inline-flex items-center justify-center gap-3">
               <i class="fa-brands fa-whatsapp text-brand text-lg" aria-hidden="true"></i> {{ $t('hero_btn_whatsapp', 'Test Drive') }}
@@ -550,7 +550,7 @@
           <p class="text-white/70 mt-2">{{ $t('footer_cta_subtitle', 'Hubungi kami sekarang, gratis konsultasi & jadwal test drive.') }}</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3">
-          <a href="https://wa.me/6281234567890" class="btn-fun text-white font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">
+          <a href="https://wa.me/{{ $waNumber }}" class="btn-fun text-white font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">
             <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i> {{ $t('footer_cta_wa_label', 'Chat WhatsApp') }}
           </a>
           <a href="tel:+622100000000" class="btn-soft text-ink font-display font-bold px-7 py-4 rounded-full inline-flex items-center justify-center gap-2">

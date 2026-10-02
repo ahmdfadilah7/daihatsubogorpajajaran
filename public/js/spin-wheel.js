@@ -15,7 +15,7 @@ window.App = window.App || {};
   const hub     = $('#spinHub');
   if (!canvas || !overlay || PRIZES.length === 0) return;
 
-  const WA_NUMBER = '6281234567890';
+  const WA_NUMBER = (window.App && window.App.WA) ? window.App.WA : '6281234567890';
   const ctx = canvas.getContext('2d');
   const N = PRIZES.length;
   const SLICE = (2 * Math.PI) / N;      // sudut per segmen (radian)
