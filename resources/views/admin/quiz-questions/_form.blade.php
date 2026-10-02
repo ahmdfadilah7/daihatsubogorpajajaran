@@ -40,8 +40,8 @@
             @error('question')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
         <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700">Ikon (Font Awesome) <span class="text-brand-600">*</span></label>
-            <input type="text" name="icon" value="{{ old('icon', $question->icon) }}" placeholder="fa-bullseye" class="{{ $inputClass }} @error('icon') {{ $errClass }} @enderror">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Ikon <span class="text-brand-600">*</span></label>
+            <x-admin.icon-select name="icon" :value="old('icon', $question->icon)" :required="true" />
             @error('icon')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
@@ -74,9 +74,27 @@
 <script>
 (function () {
     const carModels = @json($carModels);
+    const iconList = @json(config('icons.list'));
     const initial = @json($optionsData);
     const wrap = document.getElementById('options-wrap');
     let optIndex = 0;
+
+    function escapeAttr(v) {
+        return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Builds the icon <select> markup (string) for an option row, matching the
+    // native-select look used elsewhere, with the stored icon pre-selected.
+    function iconSelect(name, selected) {
+        let html = '<select name="' + name + '" class="icon-field w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">';
+        html += '<option value="">— pilih ikon —</option>';
+        Object.keys(iconList).forEach(function (cls) {
+            const label = iconList[cls];
+            html += '<option value="' + escapeAttr(cls) + '"' + (cls === selected ? ' selected' : '') + '>' + escapeAttr(label) + ' (' + escapeAttr(cls) + ')</option>';
+        });
+        html += '</select>';
+        return html;
+    }
 
     function modelSelect(name, selected) {
         let html = '<select name="' + name + '" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">';
@@ -117,7 +135,10 @@
                 '<div><label class="block text-xs font-medium text-slate-600 mb-1">Teks</label>' +
                 '<input type="text" name="options[' + i + '][text]" value="' + (opt.text ? opt.text.replace(/"/g, "&quot;") : '') + '" class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500"></div>' +
                 '<div><label class="block text-xs font-medium text-slate-600 mb-1">Ikon</label>' +
-                '<input type="text" name="options[' + i + '][icon]" value="' + (opt.icon ? opt.icon.replace(/"/g, "&quot;") : '') + '" placeholder="fa-city" class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500"></div>' +
+                '<div class="flex items-center gap-2">' +
+                    '<span class="icon-preview flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700"><i class="fa-solid ' + (opt.icon || '') + '"></i></span>' +
+                    iconSelect('options[' + i + '][icon]', opt.icon || '') +
+                '</div></div>' +
             '</div>' +
             '<div class="flex items-center justify-between mb-2">' +
                 '<span class="text-xs font-medium text-slate-500">Skor per model</span>' +
@@ -133,6 +154,15 @@
             scoresWrap.appendChild(scoreRow(i, '', ''));
         });
         block.querySelector('.remove-option').addEventListener('click', function () { block.remove(); });
+
+        // Keep the small icon preview in sync with the selected icon class.
+        const iconField = block.querySelector('.icon-field');
+        const iconPreview = block.querySelector('.icon-preview i');
+        if (iconField && iconPreview) {
+            iconField.addEventListener('change', function () {
+                iconPreview.className = 'fa-solid ' + (iconField.value || '');
+            });
+        }
         return block;
     }
 

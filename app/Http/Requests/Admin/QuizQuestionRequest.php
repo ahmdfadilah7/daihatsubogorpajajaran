@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class QuizQuestionRequest extends FormRequest
 {
@@ -16,12 +17,14 @@ class QuizQuestionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $allowedIcons = array_keys(config('icons.list', []));
+
         return [
             'question' => ['required', 'string', 'max:255'],
-            'icon' => ['required', 'string', 'max:60'],
+            'icon' => ['required', 'string', 'max:60', Rule::in($allowedIcons)],
             'options' => ['required', 'array', 'min:1'],
             'options.*.text' => ['required', 'string', 'max:255'],
-            'options.*.icon' => ['required', 'string', 'max:60'],
+            'options.*.icon' => ['required', 'string', 'max:60', Rule::in($allowedIcons)],
             'options.*.scores' => ['nullable', 'array'],
             'options.*.scores.*.car_model' => ['required_with:options.*.scores.*.points', 'string', 'max:100'],
             'options.*.scores.*.points' => ['required_with:options.*.scores.*.car_model', 'integer', 'between:0,100'],
@@ -37,10 +40,12 @@ class QuizQuestionRequest extends FormRequest
             'required' => 'Kolom ini wajib diisi.',
             'question.required' => 'Pertanyaan wajib diisi.',
             'icon.required' => 'Ikon wajib diisi.',
+            'icon.in' => 'Ikon yang dipilih tidak dikenali.',
             'options.required' => 'Minimal satu pilihan jawaban diperlukan.',
             'options.min' => 'Minimal satu pilihan jawaban diperlukan.',
             'options.*.text.required' => 'Teks pilihan wajib diisi.',
             'options.*.icon.required' => 'Ikon pilihan wajib diisi.',
+            'options.*.icon.in' => 'Ikon pilihan yang dipilih tidak dikenali.',
             'options.*.scores.*.car_model.required_with' => 'Model mobil wajib dipilih bila poin diisi.',
             'options.*.scores.*.points.required_with' => 'Poin wajib diisi bila model dipilih.',
             'options.*.scores.*.points.between' => 'Poin harus antara 0 dan 100.',

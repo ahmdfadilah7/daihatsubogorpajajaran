@@ -95,4 +95,49 @@ class RequestValidationTest extends TestCase
         $this->actingAs($user)->post(route('admin.cars.store'), $this->validCar(['img' => 'random.jpg']))
             ->assertSessionHasErrors('img');
     }
+
+    public function test_icon_list_contains_all_seeded_icons(): void
+    {
+        $allowed = array_keys(config('icons.list'));
+        $seeded = [
+            // marquee seeds
+            'fa-gas-pump', 'fa-shield-halved', 'fa-wrench', 'fa-hand-holding-dollar', 'fa-users', 'fa-award',
+            // quiz seeds
+            'fa-bullseye', 'fa-city', 'fa-people-roof', 'fa-mountain-sun', 'fa-truck-fast', 'fa-user',
+            'fa-user-group', 'fa-people-group', 'fa-heart', 'fa-wand-magic-sparkles', 'fa-tag', 'fa-wallet',
+            'fa-coins', 'fa-money-bill', 'fa-gem',
+        ];
+
+        $this->assertEmpty(array_diff($seeded, $allowed), 'All seeded icons must be present in config(icons.list).');
+    }
+
+    public function test_marquee_accepts_a_known_icon_and_rejects_an_unknown_one(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('admin.marquee-items.store'), [
+            'text' => 'Irit', 'icon' => 'fa-gas-pump', 'color' => '#0a5fd1', 'sort_order' => 0,
+        ])->assertSessionDoesntHaveErrors('icon');
+
+        $this->actingAs($user)->post(route('admin.marquee-items.store'), [
+            'text' => 'Irit', 'icon' => 'fa-not-a-real-icon', 'color' => '#0a5fd1', 'sort_order' => 0,
+        ])->assertSessionHasErrors('icon');
+    }
+
+    public function test_quiz_rejects_an_unknown_question_or_option_icon(): void
+    {
+        $user = User::factory()->create();
+
+        // Unknown question icon.
+        $this->actingAs($user)->post(route('admin.quiz-questions.store'), [
+            'question' => 'Uji?', 'icon' => 'fa-not-a-real-icon',
+            'options' => [['text' => 'A', 'icon' => 'fa-city', 'scores' => []]],
+        ])->assertSessionHasErrors('icon');
+
+        // Unknown option icon.
+        $this->actingAs($user)->post(route('admin.quiz-questions.store'), [
+            'question' => 'Uji?', 'icon' => 'fa-bullseye',
+            'options' => [['text' => 'A', 'icon' => 'fa-not-a-real-icon', 'scores' => []]],
+        ])->assertSessionHasErrors('options.0.icon');
+    }
 }

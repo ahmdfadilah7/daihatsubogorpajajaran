@@ -11,15 +11,10 @@
         @error('text')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
     </div>
 
-    <div x-data="{ icon: @js(old('icon', $item->icon ?? '')) }">
+    <div>
         <label class="mb-1.5 block text-sm font-medium text-slate-700">Ikon <span class="text-brand-600">*</span></label>
-        <div class="flex items-center gap-2">
-            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700">
-                <i class="fa-solid" :class="icon"></i>
-            </span>
-            <input type="text" name="icon" x-model="icon" placeholder="fa-gas-pump" class="flex-1 {{ $inputClass }} @error('icon') {{ $errClass }} @enderror">
-        </div>
-        <p class="mt-1 flex items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-circle-info"></i>Kelas Font Awesome, mis. fa-gas-pump</p>
+        <x-admin.icon-select name="icon" :value="old('icon', $item->icon ?? '')" :required="true" />
+        <p class="mt-1 flex items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-circle-info"></i>Pilih ikon dari daftar; pratinjau tampil di sebelah kiri.</p>
         @error('icon')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
     </div>
 
