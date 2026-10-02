@@ -377,32 +377,54 @@
           <p class="text-ink-500 mt-5">{{ $t('sec_credit_subtitle', 'Atur harga, uang muka, dan tenor sesukamu untuk melihat perkiraan angsuran bulanan. Gampang, cepat, tanpa perlu daftar.') }}</p>
         </div>
 
+        @php
+          // Local credit params for the SSR slider attributes (so the markup
+          // and window.App.CREDIT agree). Names chosen to avoid colliding with
+          // the head @php helpers ($t/$flagOn/$assetUrl/$s*). Defaults match
+          // today's slider attributes + RATE 0.04. Defaults clamped into bounds.
+          $cNum = fn ($key, $default) => (($settings[$key] ?? '') !== '') ? 0 + $settings[$key] : $default;
+          $cMinDp = $cNum('credit_min_dp', 10);
+          $cMaxDp = $cNum('credit_max_dp', 50);
+          $cDpStep = $cNum('credit_dp_step', 5);
+          $cDefDp = max($cMinDp, min($cMaxDp, $cNum('credit_default_dp', 20)));
+          $cMinTenor = $cNum('credit_min_tenor', 1);
+          $cMaxTenor = $cNum('credit_max_tenor', 6);
+          $cDefTenor = max($cMinTenor, min($cMaxTenor, $cNum('credit_default_tenor', 4)));
+          $cFirstPrice = (int) ($cars[0]['price'] ?? 0);
+        @endphp
         <!-- Kalkulator cicilan interaktif (satu card) -->
         <div class="reveal bg-white rounded-3xl shadow-xl p-8 md:p-10 max-w-3xl mx-auto">
           <!-- Slider input -->
           <div class="space-y-6">
             <div>
               <div class="flex justify-between text-sm font-semibold text-ink mb-2">
-                <label for="calcPrice">{{ $t('calc_label_price', 'Harga Mobil') }}</label>
-                <span id="calcPriceLabel" class="text-brand">Rp 200.000.000</span>
+                <label for="calcCar">{{ $t('calc_label_price', 'Harga Mobil') }}</label>
+                <span id="calcPriceLabel" class="text-brand">{{ $cars ? 'Rp '.number_format($cFirstPrice, 0, ',', '.') : 'Rp 0' }}</span>
               </div>
-              <input id="calcPrice" type="range" min="150000000" max="400000000" step="5000000" value="200000000"
-                     class="w-full accent-brand cursor-pointer" />
+              <select id="calcCar" class="w-full rounded-xl border-ink/15 text-sm font-semibold text-ink focus:border-brand focus:ring-brand cursor-pointer">
+                @forelse ($cars as $car)
+                  <option value="{{ $car['id'] }}" data-price="{{ (int) $car['price'] }}" @selected($loop->first)>
+                    {{ $car['model'] }}{{ $car['type'] ? ' '.$car['type'] : '' }} — Rp {{ number_format((int) $car['price'], 0, ',', '.') }}
+                  </option>
+                @empty
+                  <option value="" data-price="0">Belum ada mobil</option>
+                @endforelse
+              </select>
             </div>
             <div>
               <div class="flex justify-between text-sm font-semibold text-ink mb-2">
                 <label for="calcDp">{{ $t('calc_label_dp', 'Uang Muka (DP)') }}</label>
-                <span id="calcDpLabel" class="text-brand">20%</span>
+                <span id="calcDpLabel" class="text-brand">{{ $cDefDp }}%</span>
               </div>
-              <input id="calcDp" type="range" min="10" max="50" step="5" value="20"
+              <input id="calcDp" type="range" min="{{ $cMinDp }}" max="{{ $cMaxDp }}" step="{{ $cDpStep }}" value="{{ $cDefDp }}"
                      class="w-full accent-brand cursor-pointer" />
             </div>
             <div>
               <div class="flex justify-between text-sm font-semibold text-ink mb-2">
                 <label for="calcTenor">{{ $t('calc_label_tenor', 'Tenor') }}</label>
-                <span id="calcTenorLabel" class="text-brand">4 Tahun</span>
+                <span id="calcTenorLabel" class="text-brand">{{ $cDefTenor }} Tahun</span>
               </div>
-              <input id="calcTenor" type="range" min="1" max="6" step="1" value="4"
+              <input id="calcTenor" type="range" min="{{ $cMinTenor }}" max="{{ $cMaxTenor }}" step="1" value="{{ $cDefTenor }}"
                      class="w-full accent-brand cursor-pointer" />
             </div>
           </div>

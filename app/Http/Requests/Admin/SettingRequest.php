@@ -131,6 +131,16 @@ class SettingRequest extends FormRequest
             'footer_map_cta' => ['nullable', 'string', 'max:255'],
             'footer_copyright' => ['nullable', 'string', 'max:255'],
             'footer_credit' => ['nullable', 'string', 'max:1000'],
+
+            // === Simulasi Kredit (parameter rumus) ===
+            'credit_interest_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'credit_min_dp' => ['nullable', 'numeric', 'min:0', 'max:100', 'lte:credit_max_dp'],
+            'credit_max_dp' => ['nullable', 'numeric', 'min:0', 'max:100', 'gte:credit_min_dp'],
+            'credit_default_dp' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'credit_dp_step' => ['nullable', 'numeric', 'min:1', 'max:100'],
+            'credit_min_tenor' => ['nullable', 'integer', 'min:1', 'max:30', 'lte:credit_max_tenor'],
+            'credit_max_tenor' => ['nullable', 'integer', 'min:1', 'max:30', 'gte:credit_min_tenor'],
+            'credit_default_tenor' => ['nullable', 'integer', 'min:1', 'max:30'],
         ];
     }
 
@@ -174,6 +184,23 @@ class SettingRequest extends FormRequest
             'footer_cta_subtitle.max' => 'Subjudul CTA footer maksimal 1000 karakter.',
             'footer_about.max' => 'Teks tentang maksimal 1000 karakter.',
             'footer_credit.max' => 'Teks kredit footer maksimal 1000 karakter.',
+
+            // Simulasi Kredit (parameter rumus)
+            'credit_interest_rate.numeric' => 'Bunga harus berupa angka.',
+            'credit_interest_rate.min' => 'Bunga tidak boleh kurang dari 0.',
+            'credit_interest_rate.max' => 'Bunga tidak boleh lebih dari 100.',
+            'credit_min_dp.lte' => 'DP minimum tidak boleh lebih besar dari DP maksimum.',
+            'credit_max_dp.gte' => 'DP maksimum tidak boleh lebih kecil dari DP minimum.',
+            'credit_min_dp.numeric' => 'DP minimum harus berupa angka.',
+            'credit_max_dp.numeric' => 'DP maksimum harus berupa angka.',
+            'credit_default_dp.numeric' => 'DP default harus berupa angka.',
+            'credit_dp_step.numeric' => 'Kelipatan DP harus berupa angka.',
+            'credit_dp_step.min' => 'Kelipatan DP minimal 1.',
+            'credit_min_tenor.integer' => 'Tenor minimum harus bilangan bulat.',
+            'credit_max_tenor.integer' => 'Tenor maksimum harus bilangan bulat.',
+            'credit_default_tenor.integer' => 'Tenor default harus bilangan bulat.',
+            'credit_min_tenor.lte' => 'Tenor minimum tidak boleh lebih besar dari tenor maksimum.',
+            'credit_max_tenor.gte' => 'Tenor maksimum tidak boleh lebih kecil dari tenor minimum.',
         ];
     }
 }

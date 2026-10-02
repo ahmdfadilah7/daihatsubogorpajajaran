@@ -8,8 +8,12 @@ use Illuminate\Database\Seeder;
 class SiteSettingSeeder extends Seeder
 {
     /**
-     * Seed the default site settings. Idempotent via updateOrCreate per key;
-     * defaults match the CURRENT public site so nothing changes until edited.
+     * Seed the default site settings. Two idempotency strategies:
+     *   - updateOrCreate for canonical identity/meta defaults ($defaults):
+     *     re-seeding re-asserts these values (they are not admin-tunable here).
+     *   - firstOrCreate for admin-tunable values ($featureFlags, $texts,
+     *     $creditDefaults): re-seeding never clobbers an admin's edits.
+     * Defaults match the CURRENT public site so nothing changes until edited.
      */
     public function run(): void
     {
@@ -133,6 +137,25 @@ class SiteSettingSeeder extends Seeder
         ];
 
         foreach ($texts as $key => $value) {
+            SiteSetting::firstOrCreate(['key' => $key], ['value' => $value]);
+        }
+
+        // Credit-simulation formula parameters (numeric, stored as strings).
+        // firstOrCreate so re-seeding preserves admin edits. Defaults reproduce
+        // the current slider bounds + the hardcoded RATE=0.04 => page math
+        // unchanged until an admin tunes them in Pengaturan.
+        $creditDefaults = [
+            'credit_interest_rate' => '4',
+            'credit_default_dp'    => '20',
+            'credit_min_dp'        => '10',
+            'credit_max_dp'        => '50',
+            'credit_dp_step'       => '5',
+            'credit_min_tenor'     => '1',
+            'credit_max_tenor'     => '6',
+            'credit_default_tenor' => '4',
+        ];
+
+        foreach ($creditDefaults as $key => $value) {
             SiteSetting::firstOrCreate(['key' => $key], ['value' => $value]);
         }
 

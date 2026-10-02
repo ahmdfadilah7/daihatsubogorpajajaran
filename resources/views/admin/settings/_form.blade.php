@@ -17,6 +17,7 @@
         ['id' => 'hero', 'label' => 'Hero', 'icon' => 'fa-star'],
         ['id' => 'bagian', 'label' => 'Bagian', 'icon' => 'fa-heading'],
         ['id' => 'kalkulator', 'label' => 'Kalkulator', 'icon' => 'fa-calculator'],
+        ['id' => 'simulasi', 'label' => 'Simulasi Kredit', 'icon' => 'fa-percent'],
         ['id' => 'roda', 'label' => 'Roda', 'icon' => 'fa-trophy'],
         ['id' => 'footer', 'label' => 'Footer', 'icon' => 'fa-shoe-prints'],
     ];
@@ -505,6 +506,56 @@
             <textarea name="calc_footnote" rows="2" placeholder="*Estimasi bunga flat 4%/tahun. Angka sebenarnya menyesuaikan leasing." class="{{ $inputClass }} @error('calc_footnote') {{ $errClass }} @enderror">{{ $val('calc_footnote') }}</textarea>
             <p class="mt-1 text-xs text-slate-400">Catatan kecil di bawah tombol.</p>
             @error('calc_footnote')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+    </x-admin.form-section>
+    </div>
+
+    {{-- ============================ Simulasi Kredit (parameter rumus) ============================ --}}
+    <div x-show="tab === 'simulasi'" x-cloak>
+    <x-admin.form-section title="Parameter Simulasi Kredit" subtitle="Atur rumus kalkulator cicilan: bunga, uang muka, dan tenor." icon="fa-percent">
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Bunga Flat per Tahun (%)</label>
+            <input type="number" step="0.1" min="0" max="100" name="credit_interest_rate" value="{{ $val('credit_interest_rate') }}" placeholder="4" class="{{ $inputClass }} @error('credit_interest_rate') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Bunga flat per tahun dalam persen. Contoh: 8 untuk 8%.</p>
+            @error('credit_interest_rate')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">DP Default (%)</label>
+            <input type="number" step="1" min="0" max="100" name="credit_default_dp" value="{{ $val('credit_default_dp') }}" placeholder="20" class="{{ $inputClass }} @error('credit_default_dp') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Posisi awal slider uang muka.</p>
+            @error('credit_default_dp')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">DP Minimum (%)</label>
+            <input type="number" step="1" min="0" max="100" name="credit_min_dp" value="{{ $val('credit_min_dp') }}" placeholder="10" class="{{ $inputClass }} @error('credit_min_dp') {{ $errClass }} @enderror">
+            @error('credit_min_dp')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">DP Maksimum (%)</label>
+            <input type="number" step="1" min="0" max="100" name="credit_max_dp" value="{{ $val('credit_max_dp') }}" placeholder="50" class="{{ $inputClass }} @error('credit_max_dp') {{ $errClass }} @enderror">
+            @error('credit_max_dp')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Kelipatan DP (%)</label>
+            <input type="number" step="1" min="1" max="100" name="credit_dp_step" value="{{ $val('credit_dp_step') }}" placeholder="5" class="{{ $inputClass }} @error('credit_dp_step') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Langkah geser slider uang muka.</p>
+            @error('credit_dp_step')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tenor Default (tahun)</label>
+            <input type="number" step="1" min="1" max="30" name="credit_default_tenor" value="{{ $val('credit_default_tenor') }}" placeholder="4" class="{{ $inputClass }} @error('credit_default_tenor') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Posisi awal slider tenor.</p>
+            @error('credit_default_tenor')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tenor Minimum (tahun)</label>
+            <input type="number" step="1" min="1" max="30" name="credit_min_tenor" value="{{ $val('credit_min_tenor') }}" placeholder="1" class="{{ $inputClass }} @error('credit_min_tenor') {{ $errClass }} @enderror">
+            @error('credit_min_tenor')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Tenor Maksimum (tahun)</label>
+            <input type="number" step="1" min="1" max="30" name="credit_max_tenor" value="{{ $val('credit_max_tenor') }}" placeholder="6" class="{{ $inputClass }} @error('credit_max_tenor') {{ $errClass }} @enderror">
+            @error('credit_max_tenor')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
     </x-admin.form-section>
     </div>

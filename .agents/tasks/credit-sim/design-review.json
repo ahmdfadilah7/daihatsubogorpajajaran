@@ -1,0 +1,54 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "id": 1,
+      "severity": "HIGH",
+      "title": "App.CREDIT must be emitted INSIDE the existing <script> block in app-data.blade.php",
+      "where": "resources/views/partials/app-data.blade.php — design section 'Public bootstrap — window.App.CREDIT'",
+      "problem": "app-data.blade.php is a single <script>...</script> element. The design says 'Add to app-data.blade.php' the @php closure + 'App.CREDIT = {...};' JS, but gives no placement anchor. Taken literally (appended after the partial's current content), the App.CREDIT assignment renders as inert HTML text outside the <script> tag and window.App.CREDIT is undefined at runtime.",
+      "fix": "Put the @php $creditNum closure ABOVE the <script> tag and insert the App.CREDIT = {...} assignment as the last line BEFORE </script>, alongside the existing App.CARS/App.QUIZ assignments."
+    },
+    {
+      "id": 2,
+      "severity": "MEDIUM",
+      "title": "rate: {{ ... }} / 100 relies on fragile PHP string coercion for decimal interest",
+      "where": "resources/views/partials/app-data.blade.php — 'rate' line; interest input is type=number step=0.1, validated 'numeric' (decimals allowed)",
+      "problem": "The design asserts the value 'renders literally as 4 / 100', true only for integers. With decimals allowed, emission leans on how PHP stringifies 0 + stored-string and on the stored string being digit-clean; a stray comma/space coerces and silently drops the fraction.",
+      "fix": "Emit a guaranteed JS float via json_encode(round(((($settings['credit_interest_rate'] ?? '') !== '') ? 0 + $settings['credit_interest_rate'] : 4) / 100, 6)) and drop the inline '/ 100'. Apply json_encode(0 + ...) to the other 8 numeric fields for consistency."
+    },
+    {
+      "id": 3,
+      "severity": "MEDIUM",
+      "title": "New home.blade.php @php block has no concrete placement/scope anchor",
+      "where": "resources/views/home.blade.php — design 'Public markup — home.blade.php calculator card', the local @php param block",
+      "problem": "home.blade.php already has a top-of-head @php block defining $settings/$t/$flagOn/$assetUrl (lines 6-43). The design adds a second @php block 'just before the card markup' defining $cNum + seven $c* vars with no precise location, and must share the same Blade scope as the <select>/sliders. Ambiguity risks collision with existing helpers or an out-of-scope definition.",
+      "fix": "Pin it: insert the @php block immediately before the opening <div class=\"reveal bg-white rounded-3xl ...\"> of the calculator card (~line 382), same scope as the sliders, in ADDITION to (not replacing) the head @php block. Confirm $cNum/$c* names do not collide (they currently do not)."
+    },
+    {
+      "id": 4,
+      "severity": "NIT",
+      "title": "default_dp / default_tenor may be off the step grid on initial render",
+      "where": "resources/views/home.blade.php — SSR clamp of $cDefDp/$cDefTenor",
+      "problem": "Design clamps defaults into [min,max] but not onto the step grid; an off-grid default (e.g. 23 with step 5) renders a thumb between stops until first drag.",
+      "fix": "Optionally snap to grid in the @php block, or document in Open Questions that off-grid defaults self-correct on first interaction."
+    },
+    {
+      "id": 5,
+      "severity": "NIT",
+      "title": "Test plan uses PATCH; existing suite/convention uses PUT",
+      "where": "design 'Testability'; tests/Feature/AdminSettingTest.php",
+      "problem": "Route matches both put/patch, but every existing settings test uses ->put(route('admin.settings.update'), ...). The design presents PATCH as the pattern.",
+      "fix": "Use ->put(...) to match the house pattern, or explicitly note PATCH is intentional."
+    },
+    {
+      "id": 6,
+      "severity": "NIT",
+      "title": "Seeder docblock 'Idempotent via updateOrCreate per key' becomes more misleading",
+      "where": "database/seeders/SiteSettingSeeder.php class docblock",
+      "problem": "The seeder already mixes updateOrCreate (meta) and firstOrCreate (flags/texts); adding another firstOrCreate block (correct) widens the gap with the one-line docblock.",
+      "fix": "Tweak the docblock to note updateOrCreate for canonical defaults and firstOrCreate for admin-tunable values. Not required for correctness."
+    }
+  ],
+  "reviewDoc": "d:\\DATA - AHMAD\\Project\\kuya\\.agents\\tasks\\credit-sim\\design-review.md"
+}
