@@ -781,6 +781,7 @@
   <script src="{{ asset('js/calculator.js') }}"></script>
   <script src="{{ asset('js/corner-widget.js') }}"></script>
   <script src="{{ asset('js/spin-wheel.js') }}"></script>
+  <script src="{{ asset('js/turbo-mode.js') }}"></script>
   <script src="{{ asset('js/main.js') }}"></script>
 </body>
 </html>

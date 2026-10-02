@@ -594,3 +594,131 @@ body.promo-hidden #navbar { top: 0; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal, .fade-up { opacity: 1 !important; transform: none !important; }
 }
+
+/* =========================================================================
+   HACKER MODE — Easter egg (diaktifkan oleh public/js/turbo-mode.js dengan
+   menambahkan class .hacker-on pada <body>). Transformasi menyeluruh: tema
+   gelap hijau-terminal, hujan kode Matrix (#matrixCanvas), scanline CRT,
+   font monospace, glitch, dan badge status.
+   ========================================================================= */
+
+/* Transisi mulus saat masuk/keluar mode. */
+body { transition: background-color .5s ease, color .5s ease, filter .5s ease; }
+
+/* ---- Transformasi tema menyeluruh ---- */
+.hacker-on {
+  background: #020a06 !important;
+  color: #25d366 !important;
+  /* Rona hijau + kontras tinggi untuk seluruh halaman. */
+  filter: hue-rotate(60deg) saturate(1.3) contrast(1.08);
+  font-family: 'Courier New', monospace !important;
+}
+/* Teks di dalam situs ikut menghijau. */
+.hacker-on,
+.hacker-on .text-ink,
+.hacker-on .text-ink-500,
+.hacker-on h1, .hacker-on h2, .hacker-on h3,
+.hacker-on p, .hacker-on span, .hacker-on a, .hacker-on li, .hacker-on label {
+  color: #25d366 !important;
+  text-shadow: 0 0 4px rgba(37, 211, 102, .55);
+}
+.hacker-on .font-display { font-family: 'Courier New', monospace !important; letter-spacing: .02em; }
+
+/* Kartu / permukaan putih jadi panel gelap bergaya terminal. */
+.hacker-on .bg-white,
+.hacker-on [class*="bg-cream"],
+.hacker-on header#navbar.scrolled,
+.hacker-on #mobileMenu {
+  background: rgba(4, 20, 12, .88) !important;
+  border-color: rgba(37, 211, 102, .35) !important;
+  box-shadow: 0 0 22px rgba(37, 211, 102, .18) !important;
+  backdrop-filter: blur(2px);
+}
+
+/* Gambar sedikit "ter-hack": grayscale + rona hijau. */
+.hacker-on img { filter: grayscale(1) brightness(.85) sepia(1) hue-rotate(70deg) saturate(3); }
+
+/* Blob dekoratif jadi redup kehijauan. */
+.hacker-on .blob { filter: hue-rotate(90deg) saturate(2) brightness(.6); opacity: .35; }
+
+/* ---- Canvas hujan kode Matrix (latar paling belakang) ---- */
+#matrixCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;            /* di belakang konten (konten situs diangkat ke z-1) */
+  pointer-events: none;
+  opacity: .55;
+}
+/* Angkat konten utama & footer di atas canvas Matrix saat mode aktif, agar
+   hujan kode tampak di latar belakang tanpa menutupi isi situs. */
+.hacker-on main,
+.hacker-on header#navbar,
+.hacker-on footer,
+.hacker-on #promoBar { position: relative; z-index: 1; }
+
+/* ---- Scanline CRT tipis menutupi layar ---- */
+.hacker-on::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 2px,
+    rgba(0, 20, 10, .25) 3px,
+    rgba(0, 20, 10, .25) 4px
+  );
+  animation: crtFlicker 3s steps(60) infinite;
+}
+@keyframes crtFlicker { 0%,100%{opacity:.5} 50%{opacity:.65} }
+
+/* ---- Glitch sesaat saat dinyalakan ---- */
+.hacker-glitch { animation: hackGlitch .7s steps(2) 3; }
+@keyframes hackGlitch {
+  0%   { transform: translate(0,0);  filter: hue-rotate(60deg) saturate(1.3); }
+  20%  { transform: translate(-3px,1px); filter: hue-rotate(140deg) saturate(2) contrast(1.4); }
+  40%  { transform: translate(3px,-2px); filter: hue-rotate(20deg) invert(.05); }
+  60%  { transform: translate(-2px,0);  filter: hue-rotate(90deg) saturate(1.6); }
+  100% { transform: translate(0,0);  filter: hue-rotate(60deg) saturate(1.3); }
+}
+
+/* ---- Badge status "SYSTEM BREACHED" (penanda + tombol mematikan) ---- */
+.hacker-badge {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .55rem 1rem;
+  border: 1px solid #25d366;
+  border-radius: .4rem;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: .78rem;
+  letter-spacing: .12em;
+  color: #25d366;
+  background: #041410;
+  box-shadow: 0 0 18px rgba(37, 211, 102, .5), inset 0 0 10px rgba(37,211,102,.12);
+  text-shadow: 0 0 6px rgba(37,211,102,.8);
+}
+.hacker-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #25d366; box-shadow: 0 0 8px #25d366;
+  animation: hackBlink 1s steps(2) infinite;
+}
+@keyframes hackBlink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* Hormati preferensi kurangi animasi: tema warna + canvas statis tetap,
+   tapi kedip/scanline/glitch dimatikan agar tidak memicu ketidaknyamanan. */
+@media (prefers-reduced-motion: reduce) {
+  .hacker-on::after { animation: none; }
+  .hacker-dot { animation: none; }
+  .hacker-glitch { animation: none; }
+}
