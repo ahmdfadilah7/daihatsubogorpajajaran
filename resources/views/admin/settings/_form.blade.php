@@ -151,6 +151,17 @@
             <input type="text" name="social_youtube" value="{{ $val('social_youtube') }}" placeholder="https://youtube.com/..." class="{{ $inputClass }} @error('social_youtube') {{ $errClass }} @enderror">
             @error('social_youtube')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
         </div>
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">TikTok</label>
+            <input type="text" name="social_tiktok" value="{{ $val('social_tiktok') }}" placeholder="https://tiktok.com/@..." class="{{ $inputClass }} @error('social_tiktok') {{ $errClass }} @enderror">
+            @error('social_tiktok')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
+        <div class="md:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Google Maps</label>
+            <input type="text" name="maps_url" value="{{ $val('maps_url') }}" placeholder="https://www.google.com/maps?q=..." class="{{ $inputClass }} @error('maps_url') {{ $errClass }} @enderror">
+            <p class="mt-1 text-xs text-slate-400">Tempel tautan Google Maps lokasi showroom. Dipakai untuk peta dan tombol &quot;Buka di Google Maps&quot; di footer.</p>
+            @error('maps_url')<p class="mt-1.5 flex items-center gap-1 text-xs text-red-600"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</p>@enderror
+        </div>
     </x-admin.form-section>
     </div>
 

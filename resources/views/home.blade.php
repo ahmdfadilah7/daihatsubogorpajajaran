@@ -571,7 +571,7 @@
             <a href="{{ ($settings['social_instagram'] ?? '') !== '' ? $settings['social_instagram'] : '#' }}" aria-label="Instagram" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
             <a href="{{ ($settings['social_facebook'] ?? '') !== '' ? $settings['social_facebook'] : '#' }}" aria-label="Facebook" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
             <a href="{{ ($settings['social_youtube'] ?? '') !== '' ? $settings['social_youtube'] : '#' }}" aria-label="YouTube" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
-            <a href="#" aria-label="TikTok" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+            <a href="{{ ($settings['social_tiktok'] ?? '') !== '' ? $settings['social_tiktok'] : '#' }}" aria-label="TikTok" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-all hover:-translate-y-1"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
           </div>
         </div>
 
@@ -586,6 +586,36 @@
         </address>
 
         <!-- Lokasi showroom (Google Maps) -->
+        @php
+          // Footer map wiring. The admin sets ONE field `maps_url` (the link
+          // copied from the browser / Maps "Share"). We derive both the
+          // clickable link and the iframe embed src from it:
+          //   LINK  : use maps_url as-is (fallback to the sample when empty).
+          //   EMBED : a plain Maps URL is not always directly embeddable, so —
+          //     * if it already contains output=embed, use it as-is;
+          //     * else if it's a google.com/maps URL, append output=embed
+          //       (?/& chosen by whether it already has a query string);
+          //     * else (e.g. a maps.app.goo.gl short link, which Google does
+          //       NOT allow inside an iframe) fall back to a q-based embed of
+          //       the admin's contact_address, or the hardcoded sample.
+          //   This stays defensive: a weird URL never yields a broken iframe —
+          //   worst case it embeds the contact address / sample location.
+          $mapsSample = 'https://www.google.com/maps?q=Jl.+Jenderal+Sudirman,+Jakarta';
+          $mapsUrl = ($settings['maps_url'] ?? '') !== '' ? $settings['maps_url'] : $mapsSample;
+
+          $mapsQueryFallback = ($settings['contact_address'] ?? '') !== ''
+              ? $settings['contact_address']
+              : 'Jl. Jenderal Sudirman, Jakarta';
+          $mapsFallbackEmbed = 'https://www.google.com/maps?q=' . urlencode($mapsQueryFallback) . '&output=embed';
+
+          if (str_contains($mapsUrl, 'output=embed')) {
+              $mapsEmbed = $mapsUrl;
+          } elseif (str_contains($mapsUrl, 'google.com/maps')) {
+              $mapsEmbed = $mapsUrl . (str_contains($mapsUrl, '?') ? '&' : '?') . 'output=embed';
+          } else {
+              $mapsEmbed = $mapsFallbackEmbed;
+          }
+        @endphp
         <div class="sm:col-span-2 lg:col-span-5 reveal" style="transition-delay:.3s">
           <h3 class="font-display font-bold uppercase tracking-wider text-sm flex items-center gap-2">
             <i class="fa-solid fa-map-location-dot text-brand-light" aria-hidden="true"></i> {{ $t('footer_map_heading', 'Lokasi Kami') }}
@@ -593,12 +623,12 @@
           <div class="rounded-2xl overflow-hidden border border-white/10 shadow-lg">
             <iframe
               title="Lokasi Showroom Daihatsu Sahabat"
-              src="https://www.google.com/maps?q=Jl.+Jenderal+Sudirman,+Jakarta&output=embed"
+              src="{{ $mapsEmbed }}"
               width="100%" height="200" style="border:0; display:block;"
               loading="lazy" referrerpolicy="no-referrer-when-downgrade"
               allowfullscreen></iframe>
           </div>
-          <a href="https://www.google.com/maps?q=Jl.+Jenderal+Sudirman,+Jakarta" target="_blank" rel="noopener"
+          <a href="{{ $mapsUrl }}" target="_blank" rel="noopener"
              class="inline-flex items-center gap-2 text-brand-light text-sm font-semibold mt-3 hover:text-white transition-colors">
             <i class="fa-solid fa-diamond-turn-right" aria-hidden="true"></i> {{ $t('footer_map_cta', 'Buka di Google Maps') }}
           </a>

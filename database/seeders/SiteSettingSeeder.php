@@ -41,6 +41,20 @@ class SiteSettingSeeder extends Seeder
             SiteSetting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
+        // Admin-tunable footer links. firstOrCreate so re-seeding never clobbers
+        // an admin's edits. Defaults reproduce the CURRENT footer:
+        //   - social_tiktok '' => TikTok icon falls back to '#' (unchanged).
+        //   - maps_url = the current hardcoded sample => map iframe + "Buka di
+        //     Google Maps" link render exactly as today until edited.
+        $footerLinks = [
+            'social_tiktok' => '',
+            'maps_url' => 'https://www.google.com/maps?q=Jl.+Jenderal+Sudirman,+Jakarta',
+        ];
+
+        foreach ($footerLinks as $key => $value) {
+            SiteSetting::firstOrCreate(['key' => $key], ['value' => $value]);
+        }
+
         // Feature toggles for interactive public-site widgets. Default ENABLED
         // ('1') so the site looks identical to today. Use firstOrCreate so
         // re-seeding never clobbers a value the admin has already changed.

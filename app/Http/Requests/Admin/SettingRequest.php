@@ -47,6 +47,11 @@ class SettingRequest extends FormRequest
             'social_facebook' => ['nullable', 'string', 'max:255'],
             'social_instagram' => ['nullable', 'string', 'max:255'],
             'social_youtube' => ['nullable', 'string', 'max:255'],
+            'social_tiktok' => ['nullable', 'string', 'max:255'],
+            // Maps share links can be long (q-style / place / shortened), so
+            // allow up to 1000 chars. Lenient string (like social_*) because a
+            // raw share URL is not always a strict URL per the validator.
+            'maps_url' => ['nullable', 'string', 'max:1000'],
 
             // Fitur Situs (toggle on/off)
             'feature_quiz' => ['nullable', 'in:0,1'],
@@ -155,6 +160,8 @@ class SettingRequest extends FormRequest
             'meta_description.max' => 'Deskripsi meta maksimal 300 karakter.',
             'meta_keywords.max' => 'Kata kunci meta maksimal 255 karakter.',
             'contact_email.email' => 'Alamat email tidak valid.',
+            'social_tiktok.max' => 'Tautan TikTok maksimal 255 karakter.',
+            'maps_url.max' => 'Tautan Google Maps maksimal 1000 karakter.',
 
             'feature_quiz.in' => 'Nilai fitur Kuis tidak valid.',
             'feature_corner.in' => 'Nilai fitur Gambar Pojok tidak valid.',
